@@ -1,3 +1,6 @@
-h = 'ghy'
-print(h)
-k = 3
+import numpy as np
+
+class Simulation:
+    def __init__(self, params, spin_path):
+        self.params = params
+        

@@ -1,0 +1,2 @@
+mkdir: cannot create directory ‘output’: File exists
+mkdir: cannot create directory ‘spin_current’: File exists
