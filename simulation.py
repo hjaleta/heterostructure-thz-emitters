@@ -1,0 +1,2 @@
+h = 'ghy'
+print(h)
