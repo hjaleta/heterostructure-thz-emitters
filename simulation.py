@@ -1,17 +1,18 @@
 import numpy as np
 
 class Simulation:
-    def __init__(self, spin_current, sim_params, medium_params):
-        self.spin_current = spin_current
+    def __init__(self, J_s, sim_params, medium_params):
+        self.J_s = J_s
         self.sim_p = sim_params
+        self.jef_terms = self.sim_p["jef_terms"]
+        self.dt = self.sim_p["dt"]
         self.med_p = medium_params
         self.time = self.format_time()
         self.mediums = self.get_mediums()
+        self.exc_region = self.get_exc_region()
 
     def format_time(self):
-        dt = self.sim_p["dt"]
-        time = np.arange(0, self.spin_current.shape[0] + 1, dt)
-        # print(time)
+        time = np.arange(0, self.J_s.shape[0], self.dt)
         return time
     
     def get_mediums(self):
@@ -21,30 +22,95 @@ class Simulation:
             mediums.append(Medium(medium, self.sim_p, N_time))
         return mediums
     
-    def step(self):
+    def get_exc_region(self):
+        N_points = self.mediums[0].N_points
+        x_min, x_max = self.mediums[0].params["x"]
+        y_min, y_max = self.mediums[0].params["y"]
+        dx = self.sim_p["dx"]
+        dy = self.sim_p["dy"]
+        print(x_min, x_max, dx)
+        X = np.arange(x_min, x_max + dx, dx)
+        Y = np.arange(y_min, y_max + dy, dy)
+        if len(X) != N_points[0] or len(Y) != N_points[1]: 
+            print(len(X), N_points[0])
+            print(len(Y), N_points[1])
+            raise ValueError("Bajs")
+
+        if self.sim_p["exc_region"]["shape"] == "circle":
+            r_squared = self.sim_p["exc_region"]["radius"]**2
+            l1 = []
+            for x_i in X:
+                l2 = []
+                for y_i in Y:
+                    if x_i**2 + y_i**2 < r_squared:
+                        l2.append(1)
+                    else:
+                        l2.append(0)
+                l1.append(l2)
+            print(len(l1))
+            region = np.array(l1)
+            print(region)
+            return region
+
+    def run(self):
         dt = self.sim_p["dt"]
-        
-            
+        if self.jef_terms["J"] or self.jef_terms["J_t"]:
+            for medium in self.mediums:
+                if medium.params["use_J"]:
+                    medium.arrays["J"] = self.exc_region.copy() * medium
+        for t_i in range(len(self.time)):
+            self.step(t_i, dt)
+
+
+    def step(self, t_i):
+        z_0 = 0
+        for medium in self.mediums:
+            z_end = int((medium.params["z"][1] - z_0)/self.sim_p["dz"])
+            for arr in medium.arrays:
+                if medium.arrays[arr] == None:
+                    continue
+                elif arr == "J":
+                    medium.arrays[arr][t_i,:,:,:] = self.exc_region.copy() * self.J_s.copy()[t_i,z_0:z_end]
+            if self.jef_terms["rho"]:
+                pass
+            if self.jef_terms["rho_t"]:
+                pass
+            if self.jef_terms["J"]:
+                pass
+            if self.jef_terms["J_t"]:
+                pass
+
 class Medium:
     def __init__(self, params, sim_params, N_time):
         self.params = params
         self.use_FEM = self.params['FEM']
-        self.arrays = self.get_arrays(sim_params, N_time)
+        self.format_domain(sim_params)
+        self.N_points = self.get_N_points(sim_params)
+        self.arrays = self.get_arrays(N_time)
     
-    def get_arrays(self, sim_p, N_time):
-        dx, dy, dz = sim_p["dx"], sim_p["dy"], sim_p["dz"]
-        N_points = lambda coord: int((self.params[coord][1] - self.params[coord][0])/sim_p[f"d{coord}"] + 1 - int(self.use_FEM))
-        # use_FEM = self.params["FEM"]
+    def format_domain(self, sim_params):
+        if self.use_FEM:
+            for coord in ["x", "y", "z"]:
+                old_min, old_max = self.params[coord]
+                shift = sim_params[f"d{coord}"]/2
+                self.params[coord] = (old_min + shift, old_max - shift)
+
+    def get_N_points(self, sim_p):
+        N_points = lambda coord: int((self.params[coord][1] - self.params[coord][0])/sim_p[f"d{coord}"] + 1 )# - int(self.use_FEM))
         Nx = N_points("x")
         Ny = N_points("y")
         Nz = N_points("z")
+        return (Nx, Ny, Nz)
+
+    def get_arrays(self, N_time):
+        Nx, Ny, Nz = self.N_points
         arrays = {}
-        for coord in self.params["use_current"]:
-            if self.params["use_current"][coord]:
+        for coord in self.params["use_J"]:
+            if self.params["use_J"][coord]:
                 arrays[f"J{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
             else:
                 arrays[f"J{coord}"] = None
-        if self.params["use_dist"]:
+        if self.params["use_rho"]:
             arrays["rho"] = np.zeros((N_time, Nx,Ny,Nz))
         else:
             arrays["rho"] = None
@@ -66,28 +132,29 @@ if __name__ == "__main__":
     med_params = [
         {"type": "Mag",
         "x": (-2000, 2000), "y":(-2000, 2000), "z": (0,5), "FEM":True,
-        "use_current":{"x": False, "y": False, "z":False}, 
-        "use_dist":False, 
+        "use_J":{"x": False, "y": False, "z":False}, 
+        "use_rho":False, 
         "use_field": False,
         "material":"Fe", "gamma":0},
 
         {"type": "nonMag",
         "x": (-2000, 2000), "y":(-2000, 2000), "z": (5,8), "FEM":True,
-        "use_current":{"x": True, "y": False, "z":False}, 
-        "use_dist":False, 
+        "use_J":{"x": True, "y": False, "z":False}, 
+        "use_rho":False, 
         "use_field": False,
         "material":"Pt", "gamma":0.068},
 
         {"type":"vacuum",
         "x": (0, 0), "y":(0, 0), "z": (9, 10000), "FEM":False,
-        "use_current":{"x": True, "y": False, "z":False}, 
-        "use_dist":False, 
+        "use_J":{"x": False, "y": False, "z":False}, 
+        "use_rho":False, 
         "use_field": True,
         "material":"vacuum", "gamma":0}
     ]
     k = open("data/FePt_bilayer-open/flux.out")
-    spin_current = np.loadtxt("data/FePt_bilayer-open/flux.out")
-    print(spin_current.shape)
+    spin_current = np.loadtxt("data/FePt_bilayer-open/flux.out") # 
+    #print(spin_current.shape)
     sim = Simulation(spin_current, sim_params, med_params)
+    # print(sim.mediums[2].arrays["Ex"].shape)
 
 
