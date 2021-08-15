@@ -24,6 +24,7 @@ class Simulation:
     
     def get_exc_region(self):
         N_points = self.mediums[0].N_points
+        N_z = self.J_s.shape[1]
         x_min, x_max = self.mediums[0].params["x"]
         y_min, y_max = self.mediums[0].params["y"]
         dx = self.sim_p["dx"]
@@ -47,9 +48,9 @@ class Simulation:
                     else:
                         l2.append(0)
                 l1.append(l2)
-            print(len(l1))
-            region = np.array(l1)
-            print(region)
+            
+            region = np.array([l1]*N_z)
+            print(region.shape)
             return region
 
     def run(self):
@@ -57,7 +58,7 @@ class Simulation:
         if self.jef_terms["J"] or self.jef_terms["J_t"]:
             for medium in self.mediums:
                 if medium.params["use_J"]:
-                    medium.arrays["J"] = self.exc_region.copy() * medium
+                    medium.arrays["J"] = self.exc_region.copy() * medium.params
         for t_i in range(len(self.time)):
             self.step(t_i, dt)
 
