@@ -57,10 +57,12 @@ class Simulation:
             return region
 
     def get_time_delay(self):
-        for medium in self.mediums:
-            if medium.params["use_field"]:
-                for z in np.arange():
-                    pass
+        for medium1 in self.mediums:
+            if medium1.params["use_field"]:
+                for z in np.arange(medium.params["z"][0], medium.params["z"][0], self.sim_p["dz2"]):
+                    for medium2 in self.mediums:
+                        if medium2.params["type"] in ["nonMag", "Mag"]:
+                            pass
 
 
     def run(self):
