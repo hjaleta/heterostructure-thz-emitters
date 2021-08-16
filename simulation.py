@@ -10,6 +10,8 @@ class Simulation:
         self.time = self.format_time()
         self.mediums = self.get_mediums()
         self.exc_region = self.get_exc_region()
+        self.get_time_delay()
+
 
     def format_time(self):
         time = np.arange(0, self.J_s.shape[0], self.dt)
@@ -29,7 +31,7 @@ class Simulation:
         y_min, y_max = self.mediums[0].params["y"]
         dx = self.sim_p["dx"]
         dy = self.sim_p["dy"]
-        print(x_min, x_max, dx)
+        # print(x_min, x_max, dx)
         X = np.arange(x_min, x_max + dx, dx)
         Y = np.arange(y_min, y_max + dy, dy)
         if len(X) != N_points[0] or len(Y) != N_points[1]: 
@@ -50,17 +52,29 @@ class Simulation:
                 l1.append(l2)
             
             region = np.array([l1]*N_z)
-            print(region.shape)
+            region = np.moveaxis(region, 0, 2)
+            # print(region.shape)
             return region
+
+    def get_time_delay(self):
+        for medium in self.mediums:
+            if medium.params["use_field"]:
+                for z in np.arange():
+                    pass
+
 
     def run(self):
         dt = self.sim_p["dt"]
         if self.jef_terms["J"] or self.jef_terms["J_t"]:
-            for medium in self.mediums:
-                if medium.params["use_J"]:
-                    medium.arrays["J"] = self.exc_region.copy() * medium.params
-        for t_i in range(len(self.time)):
-            self.step(t_i, dt)
+            z_0 = 0
+            for medium in self.mediums:     # This loop calculates the charge current induced by the ISHE
+                z_end = z_0 + medium.N_points[2]
+                if medium.params["use_J"]["x"]:
+                    print(medium.arrays["Jx"][1,:,:,:].shape)
+                    for t_i in range(len(self.time)):
+                        k = self.exc_region.copy()[:,:,z_0:z_end] * self.J_s[t_i,z_0:z_end] * medium.params["gamma"]
+                        medium.arrays["Jx"][t_i,:,:,:] =  k
+                z_0 = z_end    
 
 
     def step(self, t_i):
@@ -117,18 +131,21 @@ class Medium:
             arrays["rho"] = None
         for coord in ["x", "y", "z"]:
             if self.params["use_field"]:
-                arrays[f"E{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-                arrays[f"B{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-            else:
-                arrays[f"E{coord}"] = None
-                arrays[f"B{coord}"] = None
-        
+                if self.params["use_field"][f"E{coord}"]:
+                    arrays[f"E{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                else:
+                    arrays[f"E{coord}"] = None
+                if self.params["use_field"][f"B{coord}"]:
+                    arrays[f"B{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                else:
+                    arrays[f"B{coord}"] = None
+
         return arrays
 
 if __name__ == "__main__":
     jef_terms = {"rho": False, "rho_t": False, "J": False, "J_t": True} # Which terms from Jefimenko's equations to include
     exc_region = {"shape": "circle", "radius": 1000} # The region where the laser pulse hits the plates
-    sim_params = {"dx":10, "dy":10, "dz":1, "dt": 1, # time is fs, length is nm
+    sim_params = {"dx":500, "dy":500, "dz":1, "dz2": 1000, "dt": 1, # time is fs, length is nm
                 "jef_terms": jef_terms, "exc_region": exc_region} 
     med_params = [
         {"type": "Mag",
@@ -146,16 +163,17 @@ if __name__ == "__main__":
         "material":"Pt", "gamma":0.068},
 
         {"type":"vacuum",
-        "x": (0, 0), "y":(0, 0), "z": (9, 10000), "FEM":False,
+        "x": (0, 0), "y":(0, 0), "z": (10, 10010), "FEM":False,
         "use_J":{"x": False, "y": False, "z":False}, 
         "use_rho":False, 
-        "use_field": True,
+        "use_field": {"Ex":True, "Ey":False, "Ez":False, "Bx":False, "By":False, "Bz":False},
         "material":"vacuum", "gamma":0}
     ]
     k = open("data/FePt_bilayer-open/flux.out")
     spin_current = np.loadtxt("data/FePt_bilayer-open/flux.out") # 
     #print(spin_current.shape)
     sim = Simulation(spin_current, sim_params, med_params)
+    sim.run()
     # print(sim.mediums[2].arrays["Ex"].shape)
 
 
