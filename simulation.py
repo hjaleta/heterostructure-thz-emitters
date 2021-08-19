@@ -1,14 +1,18 @@
 import numpy as np
+from math import sqrt
 
 class Simulation:
-    def __init__(self, J_s, sim_params, medium_params):
+    def __init__(self, J_s, sim_params, medium_params, vacuum_params):
+        self.c = {"c": 299792458}
         self.J_s = J_s
         self.sim_p = sim_params
         self.jef_terms = self.sim_p["jef_terms"]
         self.dt = self.sim_p["dt"]
         self.med_p = medium_params
+        self.vac_p = vacuum_params
         self.time = self.format_time()
         self.mediums = self.get_mediums()
+        self.vacuum = self.get_vacuum()
         self.exc_region = self.get_exc_region()
         self.get_time_delay()
 
@@ -57,13 +61,29 @@ class Simulation:
             return region
 
     def get_time_delay(self):
+        mult_factor = 10**6 / self.c["c"]   # Division by C and conversion from ns to fs
         for medium1 in self.mediums:
             if medium1.params["use_field"]:
-                for z in np.arange(medium.params["z"][0], medium.params["z"][0], self.sim_p["dz2"]):
-                    for medium2 in self.mediums:
-                        if medium2.params["type"] in ["nonMag", "Mag"]:
-                            pass
+                time_delays = {}
+                for medium2 in self.mediums:
+                    if medium2.params["label"][0:3] in ["non", "Mag"]:
+                        x_min, x_max = medium2.params["x"]
+                        y_min, y_max = medium2.params["y"]
+                        z_min, z_max = medium2.params["z"]
+                        time_delay = np.zeros(medium2.N_points)
+                        dx, dy, dz =  self.sim_p["dx"], self.sim_p["dy"], self.sim_p["dz"]
+                        for z in np.arange(medium1.params["z"][0], medium1.params["z"][0], self.sim_p["dz2"]):
+                            time_delay = medium2.array[0,:,:,:].copy()
+                            for index, val in np.ndenumerate(time_delay):
+                                delta_x = x_min + index[0] * dx
+                                delta_y = y_min + index[1] * dy
+                                delta_z = z - (z_min + index[2] * dz) 
+                                delta_r = sqrt(delta_x**2 + delta_y**2 + delta_z**2)
+                                delta_t = delta_r * mult_factor
+                                time_delay[index] = delta_t
+                            
 
+                
 
     def run(self):
         dt = self.sim_p["dt"]
@@ -122,27 +142,47 @@ class Medium:
     def get_arrays(self, N_time):
         Nx, Ny, Nz = self.N_points
         arrays = {}
-        for coord in self.params["use_J"]:
-            if self.params["use_J"][coord]:
-                arrays[f"J{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+        if self.params["label"][0:3] in ["non", "Mag"]:
+            for coord in self.params["use_J"]:
+                if self.params["use_J"][coord]:
+                    arrays[f"J{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                else:
+                    arrays[f"J{coord}"] = None
+            if self.params["use_rho"]:
+                arrays["rho"] = np.zeros((N_time, Nx,Ny,Nz))
             else:
+                arrays["rho"] = None
+            for coord in ["x", "y", "z"]:
+                if self.params["use_field"]:
+                    if self.params["use_field"][f"E{coord}"]:
+                        arrays[f"E{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                    else:
+                        arrays[f"E{coord}"] = None
+                    if self.params["use_field"][f"B{coord}"]:
+                        arrays[f"B{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                    else:
+                        arrays[f"B{coord}"] = None
+        elif self.params["label"][0:6] == "vacuum":
+            for coord in self.params["use_J"]:
                 arrays[f"J{coord}"] = None
-        if self.params["use_rho"]:
-            arrays["rho"] = np.zeros((N_time, Nx,Ny,Nz))
-        else:
             arrays["rho"] = None
-        for coord in ["x", "y", "z"]:
-            if self.params["use_field"]:
-                if self.params["use_field"][f"E{coord}"]:
-                    arrays[f"E{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-                else:
-                    arrays[f"E{coord}"] = None
-                if self.params["use_field"][f"B{coord}"]:
-                    arrays[f"B{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-                else:
-                    arrays[f"B{coord}"] = None
-
+            for coord in ["x", "y", "z"]:
+                if self.params["use_field"]:
+                    if self.params["use_field"][f"E{coord}"]:
+                        arrays[f"E{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                    else:
+                        arrays[f"E{coord}"] = None
+                    if self.params["use_field"][f"B{coord}"]:
+                        arrays[f"B{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
+                    else:
+                        arrays[f"B{coord}"] = None
         return arrays
+
+class Vacuum:
+    def __init__(self, params, sim_params, N_time):
+        self.params = params
+        self.N_points = self.get_N_points(sim_params)
+        self.arrays = self.get_arrays(N_time)
 
 if __name__ == "__main__":
     jef_terms = {"rho": False, "rho_t": False, "J": False, "J_t": True} # Which terms from Jefimenko's equations to include
@@ -150,21 +190,21 @@ if __name__ == "__main__":
     sim_params = {"dx":500, "dy":500, "dz":1, "dz2": 1000, "dt": 1, # time is fs, length is nm
                 "jef_terms": jef_terms, "exc_region": exc_region} 
     med_params = [
-        {"type": "Mag",
+        {"label": "Mag",
         "x": (-2000, 2000), "y":(-2000, 2000), "z": (0,5), "FEM":True,
         "use_J":{"x": False, "y": False, "z":False}, 
         "use_rho":False, 
         "use_field": False,
         "material":"Fe", "gamma":0},
 
-        {"type": "nonMag",
+        {"label": "nonMag",
         "x": (-2000, 2000), "y":(-2000, 2000), "z": (5,8), "FEM":True,
         "use_J":{"x": True, "y": False, "z":False}, 
         "use_rho":False, 
         "use_field": False,
         "material":"Pt", "gamma":0.068},
 
-        {"type":"vacuum",
+        {"label":"vacuum",
         "x": (0, 0), "y":(0, 0), "z": (10, 10010), "FEM":False,
         "use_J":{"x": False, "y": False, "z":False}, 
         "use_rho":False, 
