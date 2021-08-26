@@ -3,8 +3,8 @@ import numpy as np
 jef_terms = {"rho": False, "rho_t": False, "J": False, "J_t": True} 
 # The region where the laser pulse hits the plates. Shape can be "circle" or "rectangle"
 # for circle, give radius in nm, for rectangle give side lengths x and y
-exc_region = {"shape": "circle", "radius": 1000, "x_side": 1000, "y_side": 1000} 
-sim_params = {"dx":50, "dy":50, "dz":1, "dt": 1, # time is fs, length is nm
+exc_region = {"shape": "circle", "radius": 500, "x_side": 1000, "y_side": 1000} 
+sim_params = {"dx":500, "dy":500, "dz":1, "dt": 1, # time is fs, length is nm
         "jef_terms": jef_terms, "exc_region": exc_region} 
 medium_params = [
     {"label": "Mag",

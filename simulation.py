@@ -3,7 +3,7 @@ from math import sqrt
 
 class Simulation:
     def __init__(self, J_s, sim_params, medium_params, vacuum_params):
-        self.c = {"c": 299792458}
+        self.c = {"c": 299792458, "eps0": 8.85418781*10**-12}
         self.J_s = J_s
         self.sim_p = sim_params
         self.jef_terms = self.sim_p["jef_terms"]
@@ -13,7 +13,6 @@ class Simulation:
         self.time = self.format_time()
         self.mediums = self.get_mediums()
         self.vacuum = self.get_vacuum()
-        self.exc_region = self.get_exc_region()
 
     def format_time(self):
         time = np.arange(0, self.J_s.shape[0], self.dt)
@@ -30,38 +29,6 @@ class Simulation:
         N_time = len(self.time)
         vac = Vacuum(self.vac_p, self.sim_p, N_time, self.mediums)
         return vac
-    
-    def get_exc_region(self):
-        N_points = self.mediums[0].N_points
-        N_z = self.J_s.shape[1]
-        x_min, x_max = self.mediums[0].params["x"]
-        y_min, y_max = self.mediums[0].params["y"]
-        dx = self.sim_p["dx"]
-        dy = self.sim_p["dy"]
-        # print(x_min, x_max, dx)
-        X = np.arange(x_min, x_max + dx, dx)
-        Y = np.arange(y_min, y_max + dy, dy)
-        if len(X) != N_points[0] or len(Y) != N_points[1]: 
-            print(len(X), N_points[0])
-            print(len(Y), N_points[1])
-            raise ValueError("Bajs")
-
-        if self.sim_p["exc_region"]["shape"] == "circle":
-            r_squared = self.sim_p["exc_region"]["radius"]**2
-            l1 = []
-            for x_i in X:
-                l2 = []
-                for y_i in Y:
-                    if x_i**2 + y_i**2 < r_squared:
-                        l2.append(1)
-                    else:
-                        l2.append(0)
-                l1.append(l2)
-            
-            region = np.array([l1]*N_z)
-            region = np.moveaxis(region, 0, 2)
-            # print(region.shape)
-            return region
                             
     def run(self):
         dt = self.sim_p["dt"]
@@ -70,9 +37,9 @@ class Simulation:
             for medium in self.mediums:     # This loop calculates the charge current induced by the ISHE
                 z_end = z_0 + medium.N_points[2]
                 if medium.params["use_J"]["x"]:
-                    print(medium.arrays["Jx"][1,:,:,:].shape)
+                    # print(medium.arrays["Jx"][1,:,:,:].shape)
                     for t_i in range(len(self.time)):
-                        k = self.exc_region.copy()[:,:,z_0:z_end] * self.J_s[t_i,z_0:z_end] * medium.params["gamma"]
+                        k = medium.exc_region.copy() * self.J_s[t_i,z_0:z_end] * medium.params["theta"]
                         medium.arrays["Jx"][t_i,:,:,:] =  k
                 z_0 = z_end    
 
@@ -80,14 +47,41 @@ class Simulation:
             self.step(t_i)
 
     def step(self, t_i):
+        dt = self.params["dt"]
+        t = t_i * dt
+        dV = self.params["dx"] * self.params["dy"] * self.params["dz"]
         z_0 = 0
-        for medium in self.mediums:
-            z_end = int((medium.params["z"][1] - z_0)/self.sim_p["dz"])
-            for arr in medium.arrays:
-                if medium.arrays[arr] == None:
-                    continue
-                elif arr == "J":
-                    medium.arrays[arr][t_i,:,:,:] = self.exc_region.copy() * self.J_s.copy()[t_i,z_0:z_end]
+        J_t_factor = 16022   # prefactor of Jefimenkos equations, converting from particle, nm, fs
+                                    # to Coulomb, meter, second 
+        for z_vacuum in self.vacuum.z:
+            Ex = 0
+            for medium in self.mediums:
+                label = medium.params["label"]
+                delta_t = self.vacuum.time_delay[label][z_vacuum].copy()
+                delta_r = self.vacuum.source_vectors[label][z_vacuum].copy()
+                # z_end = int((medium.params["z"][1] - z_0)/self.sim_p["dz"])
+                for arr in medium.arrays:
+                    if isinstance(medium.arrays[arr], type(np.array([0]))):
+                        if arr == "Jx":
+                            for index, val in np.ndenumerate(medium.arrays[arr][t_i,:,:,:]):
+                                t_ret = delta_t(index) + t
+                                if val != 0:
+                                    # t_ret = delta_t(index) + t
+                                    # t_i_ret = t_ret/dt
+
+                                    # and t_ret >= 0:
+                                    # r = delta_r(index)
+                                    # Ex += d
+                                    pass
+
+                                    
+
+                                        
+                                        
+
+
+                    print(arr)
+
             if self.jef_terms["rho"]:
                 pass
             if self.jef_terms["rho_t"]:
@@ -168,7 +162,7 @@ class Medium:
                         l2.append(0)
                 l1.append(l2)
 
-        elif sim_p["exc_region"]["shape"] == "circle":
+        elif exc_region["shape"] == "circle":
             r_squared = exc_region["radius"]**2
             l1 = []
             for x_i in X:
@@ -228,12 +222,22 @@ class Vacuum:
                         delta_y = y_min + index[1] * dy
                         delta_z = z - (z_min + index[2] * dz) 
                         delta_r = sqrt(delta_x**2 + delta_y**2 + delta_z**2)
-                        delta_t = delta_r * mult_factor
+                        delta_t = - delta_r * mult_factor
                         time_delay[index] = delta_t
                         source_vector[index] = delta_r
                     time_delays[label][z] = time_delay
                     source_vectors[label][z] = source_vector
         return time_delays, source_vectors
+
+def interpolation(val1, val2, number):
+    if (number < 0) or (number > 1):
+        raise ValueError("number must be in interval [0,1]")
+    num = val1 + number*(val1 - val2)
+    return num
+
+def back_diff2(y2, y1, y0):
+    pass
+
 
 if __name__ == "__main__":
     
@@ -241,6 +245,9 @@ if __name__ == "__main__":
 
     sim = Simulation(spin_current, sim_params, medium_params, vacuum_params)
     sim.run()
+    # print(sim.mediums[1].arrays["Jx"][100,:,:,:])
+    # print(sim.J_s[100,:]*0.068)
+    
     # print(sim.mediums[2].arrays["Ex"].shape)
 
 
