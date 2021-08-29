@@ -1,6 +1,8 @@
 import numpy as np
 from math import sqrt
 
+from numpy.lib.index_tricks import index_exp
+
 class Simulation:
     def __init__(self, J_s, sim_params, medium_params, vacuum_params):
         self.c = {"c": 299792458, "eps0": 8.85418781*10**-12}
@@ -47,45 +49,66 @@ class Simulation:
             self.step(t_i)
 
     def step(self, t_i):
-        dt = self.params["dt"]
+        dt = self.sim_p["dt"]
         t = t_i * dt
-        dV = self.params["dx"] * self.params["dy"] * self.params["dz"]
+        dV = self.sim_p["dx"] * self.sim_p["dy"] * self.sim_p["dz"]
         z_0 = 0
         J_t_factor = 16022   # prefactor of Jefimenkos equations, converting from particle, nm, fs
                                     # to Coulomb, meter, second 
+        
+        if self.jef_terms["rho"] or self.jef_terms["rho_t"]:
+            use_dist = True
+
         for z_vacuum in self.vacuum.z:
             Ex = 0
-            for medium in self.mediums:
-                label = medium.params["label"]
-                delta_t = self.vacuum.time_delay[label][z_vacuum].copy()
-                delta_r = self.vacuum.source_vectors[label][z_vacuum].copy()
-                # z_end = int((medium.params["z"][1] - z_0)/self.sim_p["dz"])
-                for arr in medium.arrays:
-                    if isinstance(medium.arrays[arr], type(np.array([0]))):
-                        if arr == "Jx":
-                            for index, val in np.ndenumerate(medium.arrays[arr][t_i,:,:,:]):
-                                t_ret = delta_t(index) + t
-                                if val != 0:
-                                    # t_ret = delta_t(index) + t
-                                    # t_i_ret = t_ret/dt
-
-                                    # and t_ret >= 0:
-                                    # r = delta_r(index)
-                                    # Ex += d
-                                    pass
-
+            for m_i, medium in enumerate(self.mediums):
+                if medium.use:
+                    label = medium.params["label"]
+                    delta_t = self.vacuum.time_delays[z_vacuum][m_i].copy()
+                    delta_r = self.vacuum.source_vectors[z_vacuum][m_i].copy()
+                    z_end = int((medium.params["z"][1] - z_0)/self.sim_p["dz"])
+                    for arr in medium.arrays:
+                        # print(arr)
+                        # if arr == "rho":
+                        #     print("hey")
+                        if isinstance(medium.arrays[arr], type(np.array([0]))):
+                            if arr == "Jx":
+                                for index, val in np.ndenumerate(medium.arrays[arr][t_i,:,:,:]):
                                     
+                                    print(index[1:])
+                                    print(delta_t.shape)
+                                
+                                    t_ret = delta_t[index[1:]] + t
+                                    t_i_ret = t_ret/dt
+                                    # raise ValueError("Bla")
+                                    J_t = get_J_t(t_i_ret, index, medium.arrays[arr])
 
+
+
+                                    if t_i_ret >= 2:
+                                        t_i3 = int(t_i_ret - number + 1) 
+                                        t_i2, t_i1, t_i0  = t_i2 - 1, t_i2 - 2, t_i2 - 3
+                                        J_i3 = medium.arrays[arr][t_i3,:,:,:][index]
+                                        J_i2 = medium.arrays[arr][t_i2,:,:,:][index]
+                                        J_i1 = medium.arrays[arr][t_i1,:,:,:][index]
+                                        J_i0 = medium.arrays[arr][t_i0,:,:,:][index]
+                                        J_2 = interpolation(J_i2, J_i3, number)
+                                        J_1 = interpolation(J_i2, J_i1, number)
+                                        J_0 = interpolation(J_i1, J_i0, number)
+                                        J_t = back_diff2(J_2, J_1, J_0, dt)
+                                    elif t_i_ret >=1:
+                                        t_i2 = int(t_i_ret - number + 1) 
+                                        t_i1, t_i0  = t_i2 - 1, t_i2 - 2
+                                        J_i2 = medium.arrays[arr][t_i2,:,:,:][index]
+                                        J_i1 = medium.arrays[arr][t_i1,:,:,:][index]
+                                        J_i0 = medium.arrays[arr][t_i0,:,:,:][index]
+                                        J_1 = interpolation(J_i2, J_i1, number)
+                                        J_0 = interpolation(J_i1, J_i0, number)
+                                        J_t = back_diff1(J_1, J_0, dt)
                                         
-                                        
-
-
                     print(arr)
 
-            if self.jef_terms["rho"]:
-                pass
-            if self.jef_terms["rho_t"]:
-                pass
+            
             if self.jef_terms["J"]:
                 pass
             if self.jef_terms["J_t"]:
@@ -98,6 +121,7 @@ class Medium:
         self.N_points = self.get_N_points(sim_params)
         self.arrays = self.get_arrays(N_time)
         self.exc_region = self.get_excitation_region(sim_params)
+        self.use = self.get_usage()
     
     def format_domain(self, sim_params):
         for coord in ["x", "y", "z"]:
@@ -180,12 +204,22 @@ class Medium:
         # print(region.shape)
         return region
 
+    def get_usage(self):
+        # self.use = boo
+        for coord in self.params["use_J"]:
+            if self.params["use_J"][coord]:
+                return True
+        if self.params["use_rho"] or self.params["use_field"]:
+            return True
+        else:
+            return False
+
 class Vacuum:
     def __init__(self, params, sim_params, N_time, mediums):
         self.params = params
         self.z = self.get_z_points()
         self.array = self.get_arrays(N_time)
-        self.time_delay, self.source_vectors = self.get_time_and_source(sim_params, mediums)
+        self.time_delays, self.source_vectors = self.get_time_and_source(sim_params, mediums)
     
     def get_z_points(self):
         return self.params["z"]
@@ -198,36 +232,41 @@ class Vacuum:
         mult_factor = 10**6 / 299792458  # Division by C and conversion from ns to fs
         time_delays = {}
         source_vectors = {}
-        for medium in mediums:
-            use_medium = False
-            if medium.params["use_rho"]:
-                use_medium = True
-            else:
-                for coord in medium.params["use_J"]:
-                    if medium.params["use_J"][coord]:
-                        use_medium = True
-            if use_medium:
-                label = medium.params["label"]
-                time_delays[label] = {}
-                source_vectors[label] = {}
-                x_min, x_max = medium.params["x"]
-                y_min, y_max = medium.params["y"]
-                z_min, z_max = medium.params["z"]
-                time_delay = np.zeros(medium.N_points)
-                source_vector = np.zeros(medium.N_points)
-                dx, dy, dz =  sim_p["dx"], sim_p["dy"], sim_p["dz"]
-                for z in self.z:
-                    for index, val in np.ndenumerate(time_delay):
+        for z in self.z:
+            time_delay =  [] 
+            source_vector = []
+            for medium in mediums:
+                if not medium.use:
+                    time_delay.append(None)
+                    source_vector.append(None)
+                else:
+                    x_min, x_max = medium.params["x"]
+                    y_min, y_max = medium.params["y"]
+                    z_min, z_max = medium.params["z"]
+                    delta_t = np.zeros(medium.N_points)
+                    delta_r = np.zeros(medium.N_points)
+                    dx, dy, dz =  sim_p["dx"], sim_p["dy"], sim_p["dz"]
+                    for index, val in np.ndenumerate(delta_t):
                         delta_x = x_min + index[0] * dx
                         delta_y = y_min + index[1] * dy
                         delta_z = z - (z_min + index[2] * dz) 
-                        delta_r = sqrt(delta_x**2 + delta_y**2 + delta_z**2)
-                        delta_t = - delta_r * mult_factor
-                        time_delay[index] = delta_t
-                        source_vector[index] = delta_r
-                    time_delays[label][z] = time_delay
-                    source_vectors[label][z] = source_vector
+                        delta_r[index] = sqrt(delta_x**2 + delta_y**2 + delta_z**2)
+                        # source_vector[index] = delta_r
+                    
+                    delta_t = - delta_r * mult_factor
+                        
+                    time_delay.append(delta_t)
+                    source_vector.append(delta_r)
+            time_delays[z] = time_delay
+            source_vectors[z] = source_vector
         return time_delays, source_vectors
+
+def J_t = get_J_t(t_i_ret, index, medium.arrays[arr]):
+    x_i, y_i, z_i = index
+    time_series = arr[:,x_i,y_i,]
+    
+
+
 
 def interpolation(val1, val2, number):
     if (number < 0) or (number > 1):
@@ -235,8 +274,14 @@ def interpolation(val1, val2, number):
     num = val1 + number*(val1 - val2)
     return num
 
-def back_diff2(y2, y1, y0):
-    pass
+def back_diff1(y1, y0, dt):
+    yprim = (y1 -y0)/dt
+    return yprim
+
+def back_diff2(y2, y1, y0, dt):
+    yprim = (1.5*y2 - 2*y1 + 0.5*y0)/dt
+    return yprim
+    
 
 
 if __name__ == "__main__":
@@ -245,9 +290,9 @@ if __name__ == "__main__":
 
     sim = Simulation(spin_current, sim_params, medium_params, vacuum_params)
     sim.run()
-    # print(sim.mediums[1].arrays["Jx"][100,:,:,:])
-    # print(sim.J_s[100,:]*0.068)
+    print(sim.mediums[1].arrays["Jx"][100,:,:,:])
+    print(sim.J_s[100,:]*0.068)
     
-    # print(sim.mediums[2].arrays["Ex"].shape)
+    # print(sim.mediums[1].arrays)
 
 
