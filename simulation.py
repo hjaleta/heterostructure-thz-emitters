@@ -239,7 +239,7 @@ class Vacuum:
                     source_vector_z.append(delta_r)
             all_time_delays.append(time_delay_z)
             all_source_vectors.append(source_vector_z)
-        return time_delays, source_vectors
+        return all_time_delays, all_source_vectors
 
 def get_J(t_i_ret, pos_index, arr):
     if t_i_ret <= 0:
