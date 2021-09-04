@@ -10,8 +10,8 @@ print(Fe.shape)
 i = 0 
 for row in Pt:
     E = row[0]
-    if E < 
-    print(row.shape)
-    i += 1
-    if i > 5:
-        raise ValueError()
+    if E < 3:
+        print(row.shape)
+        i += 1
+        if i > 5:
+            raise ValueError()
