@@ -1,0 +1,10 @@
+21-09-09:
+
+Running two jobs on TetraLith:
+
+W2-2L30
+
+This job takes very long time to calculate expgauss. Possibly a bug/infinite loop?
+Parameters are tmax 200, peakposition 50
+
+W2-3L60
