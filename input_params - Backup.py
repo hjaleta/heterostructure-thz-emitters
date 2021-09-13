@@ -30,8 +30,8 @@ vacuum_params =  {
     "use_J":{"x": False, "y": False, "z":False}, 
     "use_rho":False, 
     "use_field": {"Ex":True, "Ey":False, "Ez":False, "Bx":False, "By":False, "Bz":False},
-    "material":"vacuum", "theta":0
+    "material":"vacuum", "gamma":0
     }
 
-spin_flux_path = "data/FePt_bilayer-open/flux.out"
-spin_flux = np.loadtxt(spin_flux_path)
+spin_path = "data/FePt_bilayer-open/flux.out"
+spin_current = np.loadtxt(spin_path)
