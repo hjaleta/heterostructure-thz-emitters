@@ -3,9 +3,9 @@ DO NOT CHANGE THE FORMAT, do not enter blank lines, always make it consistent
 USE THIS FILE AS STANDARD INPUT (Ex: qbd1D.exe < input.dat )
 -> Verbosity (verbosity) [0=low,1=high,2=diagnostic]
 1
--> Smearing of Step Function (k should be high 500. is a good value)
+-> Smearing of Step Function (k should be high 500. is a good value) [Real number: put a point!]
 500.
--> Smoothing of solution (should be =0.)
+-> Smoothing of solution (should be =0.) [Real number: put a point!]
 0.
 -> Z min in nm (zmin) [Real number: put a point!]
 0.
@@ -14,18 +14,18 @@ USE THIS FILE AS STANDARD INPUT (Ex: qbd1D.exe < input.dat )
 -> t min in fs (tmin) [Real number: put a point!]
 0.
 -> t max in fs (tmax) [Real number: put a point!]
-200.
+1000.
 -> Spatial Discretization Step in nm (dz) [Real number: put a point!]
 1.0
 -> Temporal Discretization Step in fs (dt) [Real number: put a point!]
 1.0
 -> (rtbound) in fs. This is the most distant past that we take into account
-60
+100
 -> Energy Discretization Step in eV (dE) [Real number: put a point!]
-0.125 
+0.125
 -> Number of different regions 
 2
--> Places of interfaces (nm)
+-> Places of interfaces (nm) [Real number: put a point!]
 5.
 -> Materials in different regions (2 letters per material separated by a space)
 Fu Pt
@@ -35,11 +35,11 @@ materialsdata_up_down.dat reflect_ssv1.dat
 expgauss
 -> Source data
 EXPGAUSS TYPE EXTERNAL SOURCE
--> Time length of pulse (at half width)
-30.
--> Time position of peak
-50.
--> Lambda coefficients in different regions
+-> Time length of pulse (at half width) [Real number: put a point!]
+100.
+-> Time position of peak [Real number: put a point!]
+200.
+-> Lambda coefficients in different regions [Real numbers: put a point!]
 15.0 15.0
 -> Average number of excited electrons [spin,energy,region] (WARNING: Energy channels should be consistent with Material Properties!)
 Spin down
