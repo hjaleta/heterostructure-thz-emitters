@@ -8,21 +8,23 @@ sim_params = {"dx":500, "dy":500, "dz":1, "dt": 1, # time is fs, length is nm
         "jef_terms": jef_terms, "exc_region": exc_region} 
 medium_params = [
     {"label": "Mag",
-    "x": (-1000, 1000), "y":(-1000, 1000), "z": (0,5),
-    "use_J":{"x": False, "y": False, "z":False}, 
+    "x": (-1000, 1000), "y":(-1000, 1000), "z": (0,6),
+    "use_Jx": False, "use_Jy": False, "use_Jz": False, 
     "use_rho":False, 
     "use_field": False,
     "material":"Fe", "theta":0},
 
     {"label": "nonMag",
-    "x": (-1000, 1000), "y":(-1000, 1000), "z": (5,8),
-    "use_J":{"x": True, "y": False, "z":False}, 
+    "x": (-1000, 1000), "y":(-1000, 1000), "z": (6,11),
+    "use_Jx": True, "use_Jy": False, "use_Jz": False, 
     "use_rho":False, 
     "use_field": False,
     "material":"Pt", "theta":0.068}
     ]
 
-z_points = np.array([1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000]) * 100 # distances z for E(z,t) ranging between 0.1 um and 10 cm
+# z_points = np.array([1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000]) * 100 # distances z for E(z,t) ranging between 0.1 um and 10 cm
+z_points = np.array([1, 100, 10000, 10**6]) * 100 # distances z for E(z,t) ranging between 0.1 um and 10 cm
+
 
 vacuum_params =  {
     "label":"vacuum",
@@ -33,5 +35,5 @@ vacuum_params =  {
     "material":"vacuum", "theta":0
     }
 
-spin_flux_path = "data/FePt_bilayer-open/flux.out"
+spin_flux_path = "Results - Spin Current/FuPt-closed/W6-5-L60/flux.out"
 spin_flux = np.loadtxt(spin_flux_path)

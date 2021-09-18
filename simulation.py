@@ -1,5 +1,7 @@
 import numpy as np
+import sys
 from math import sqrt, floor
+import matplotlib.pyplot as plt
 
 class Simulation:
     def __init__(self, spin_flux, sim_params, medium_params, vacuum_params):
@@ -33,16 +35,7 @@ class Simulation:
                             
     def run(self):
         dt = self.sim_p["dt"]
-        # if self.jef_terms["J"] or self.jef_terms["J_t"]:
-        #     z_0 = 0
-        #     for medium in self.mediums:     # This loop calculates the charge current induced by the ISHE
-        #         z_end = z_0 + medium.N_points[2]
-        #         if medium.params["use_J"]["x"]:
-        #             for t_i in range(len(self.time)):
-        #                 k = medium.exc_region.copy() * self.J_s[t_i,z_0:z_end] * medium.params["theta"]
-        #                 medium.arrays["Jx"][t_i,:,:,:] =  k
-        #         z_0 = z_end
-        max_shift = floor(self.vacuum.min_max_delay[0])
+        max_shift = floor(self.vacuum.min_max_delay[0][0])
         for t_i, t in enumerate(self.time):
             self.step(t_i, max_shift)
 
@@ -50,48 +43,55 @@ class Simulation:
         dt = self.sim_p["dt"]
         t = t_i * dt
         dV = self.sim_p["dx"] * self.sim_p["dy"] * self.sim_p["dz"]
+        t_0 = t_i + max_shift - 2
+        t_0 = 0 if t_0 < 0 else t_0
+        t_len = t_i - t_0 + 1
+        
         J_t_factor = 16022   # prefactor of Jefimenkos equations, converting from particle, nm, fs
                                     # to Coulomb, meter, second
         if self.jef_terms["rho"] or self.jef_terms["rho_t"]:
             use_dist = True
 
         for m_i, medium in enumerate(self.mediums):
+            
+            Nx, Ny, Nz = medium.N_points
+
+
+            if medium.params["use_rho"]:
+                pass
+                # J_rho = ...
+
+
             if medium.params["use_Jx"]:
-                t_0 = t_i + max_shift - 2
-                t_0 = 0 if t_0 < 0 else t_0
-                Nx, Ny, Nz = medium.N_points
-                exc_reg = np.tile(medium.exc_region, (Nx, Ny, Nz, t_i - t_0 + 1))
-
-            # for arr in medium.arrays:
-            #     if isinstance(medium.arrays[arr], type(np.array([0]))):
-            #         if arr == "Jx":
-            #             print(medium.arrays[arr])
-            #             # raise ValueError()
-            #             for index, val in np.ndenumerate(medium.arrays[arr][t_i,:,:,:]):
-            #                 t_shift = delta_t[index]
-            #                 t_i_ret = (t + t_shift)/dt
-            #                 print(t_i_ret)
-            #                 J_t = get_J_t(t_i_ret, dt, index, medium.arrays[arr])
-            #                 r = delta_r[index]
-            #                 Ex += J_t * J_t_factor * dV/ r
-            # if medium.params["use_Jy"]:
-            #     pass
-            # if medium.params["use_Jz"]:
-            #     pass
-            # if medium.params["use_Jy"]:
-            #     pass
-
-            #     for z_i, z in enumerate(self.vacuum.z):
-            #         label = medium.params["label"]
-            #         delta_t = self.vacuum.time_delays[z_vacuum][m_i].copy()
-            #         delta_r = self.vacuum.source_vectors[z_vacuum][m_i].copy()
-            #         z_end = int((medium.params["z"][1] - z_0)/self.sim_p["dz"])
+                J = np.zeros((t_len, Nx, Ny, Nz))
                 
-                        
-            # if self.jef_terms["J"]:
-            #     pass
-            # if self.jef_terms["J_t"]:
-            #     pass
+                # print(Nx, Ny, Nz)
+                # print(t_len)
+                exc_reg = np.tile(medium.exc_region, (t_len, 1, 1, 1))
+                
+                spin_flux = medium.spin_flux[t_0:t_i+1,:].reshape((t_len, 1, 1, Nz))
+                # print(spin_flux)
+                charge_flux = exc_reg * spin_flux * medium.params["theta"]
+                # print(charge_flux.shape)
+                for z_i, z in enumerate(self.vacuum.z):
+                    Ex = 0
+                    delta_t, delta_r = self.vacuum.time_delays[z_i][m_i], self.vacuum.source_vectors[z_i][m_i],
+                    for index, val in np.ndenumerate(delta_t):
+                        # print("----")
+                        x_i, y_i, z_i2 = index
+                        t_shift = delta_t[index]
+                        r = delta_r[index]
+                        t_i_ret = (t_len - 1 + t_shift)/dt
+                        charge_flux_xyz = charge_flux[:,x_i, y_i, z_i2].copy().flatten()
+                        # print(charge_flux_xyz)
+                        # raise ValueError
+                        J_t = get_J_t(t_i_ret, dt, charge_flux_xyz)
+                        Ex += J_t*J_t_factor*dV
+                    self.vacuum.Ex_array[t_i, z_i] = Ex
+
+    def save_Ex(self, path):
+        arr = sim.vacuum.Ex_array.copy()
+        np.savetxt(path, arr)
 
 class Medium:
     def __init__(self, params, sim_params, spin_flux):
@@ -110,7 +110,7 @@ class Medium:
             self.params[coord] = (old_min + shift, old_max - shift)
 
     def get_N_points(self, sim_p):
-        N_points = lambda coord: int((self.params[coord][1] - self.params[coord][0])/sim_p[f"d{coord}"] + 1 )# - int(self.use_FEM))
+        N_points = lambda coord: int((self.params[coord][1] - self.params[coord][0])/sim_p[f"d{coord}"] + 1 )
         Nx = N_points("x")
         Ny = N_points("y")
         Nz = N_points("z")
@@ -185,9 +185,8 @@ class Medium:
         return region
 
     def get_usage(self):
-        # self.use = boo
-        for coord in self.params["use_J"]:
-            if self.params["use_J"][coord]:
+        for coord in ["x", "y", "z"]:
+            if self.params[f"use_J{coord}"]:
                 return True
         if self.params["use_rho"] or self.params["use_field"]:
             return True
@@ -198,7 +197,7 @@ class Vacuum:
     def __init__(self, params, sim_params, N_time, mediums):
         self.params = params
         self.z = self.get_z_points()
-        self.array = self.get_array(N_time)
+        self.Ex_array = self.get_array(N_time)
         self.time_delays, self.source_vectors = self.get_time_and_source(sim_params, mediums)
         self.min_max_delay = self.get_min_max_delay()
     
@@ -211,7 +210,7 @@ class Vacuum:
 
     def get_time_and_source(self, sim_p, mediums):
         mult_factor = 10**6 / 299792458  # Division by C and conversion from ns to fs
-        print(mult_factor)
+        # print(mult_factor)
         all_time_delays = []
         all_source_vectors = []
         for z in self.z:
@@ -249,7 +248,7 @@ class Vacuum:
             shifted_time_delay_z = []
             for delta_t in time_delay_z:
                 if isinstance(delta_t, arr_type):
-                    print("yo")
+                    # print("yo")
                     s = delta_t.shape
                     shift = np.ones(s) * delta_t_max
                     # print(shift)
@@ -259,7 +258,7 @@ class Vacuum:
                     shifted_time_delay_z.append(shifted_delta_t)
                 else:
                     shifted_time_delay_z.append(None)
-            print(shifted_time_delay_z)
+            # print(shifted_time_delay_z)
             all_time_delays.append(shifted_time_delay_z)
             all_source_vectors.append(source_vector_z)
         return all_time_delays, all_source_vectors
@@ -283,26 +282,33 @@ class Vacuum:
                             max = medium_max
             min_max_list.append((min, max))
         
-        print(min_max_list)
+        # print(min_max_list)
         return min_max_list
-                
 
-
-def get_J(t_i_ret, pos_index, arr):
-    if t_i_ret <= 0:
+def get_J(t_i_ret, time_series):
+    if t_i_ret <= 0 :
         return 0
     else:
-        x_i, y_i, z_i = pos_index
-        time_series = arr[:,x_i,y_i,z_i].copy()
-        num = t_i_ret % 1
-        t_0, t_1 = int(round(t_i_ret - num)), int(round(t_i_ret-num + 1)), 
-        J = interpolation(time_series[t_0], time_series[t_1], num)
+        # x_i, y_i, z_i = pos_index
+        # print(arr.shape)
+        # time_series = arr[:,x_i,y_i,z_i].copy()
+        # print(time_series.shape)
+        # print(time_series)
+        if np.abs(t_i_ret - round(t_i_ret)) < 0.001:
+            J = time_series[round(t_i_ret)]
+        else:
+            num = t_i_ret % 1
+            t_0, t_1 = round(t_i_ret - num), round(t_i_ret-num + 1)
+            if len(time_series) > 1:
+                J = interpolation(time_series[t_0], time_series[t_1], num)
+            else:
+                J = time_series[0]
         return J
 
-def get_J_t(t_i_ret, dt, pos_index, arr):
-    J_2 = get_J(t_i_ret, pos_index, arr)
-    J_1 = get_J(t_i_ret - 1, pos_index, arr)
-    J_0 = get_J(t_i_ret - 2, pos_index, arr)
+def get_J_t(t_i_ret, dt, time_series):
+    J_2 = get_J(t_i_ret, time_series)
+    J_1 = get_J(t_i_ret - 1, time_series)
+    J_0 = get_J(t_i_ret - 2, time_series)
     J_t = back_diff2(J_2, J_1, J_0, dt)
     return J_t
 
@@ -319,8 +325,6 @@ def back_diff1(y1, y0, dt):
 def back_diff2(y2, y1, y0, dt):
     yprim = (1.5*y2 - 2*y1 + 0.5*y0)/dt
     return yprim
-    
-
 
 if __name__ == "__main__":
     # np.set_printoptions(precision=0)
@@ -328,7 +332,11 @@ if __name__ == "__main__":
     from input_params import sim_params, medium_params, vacuum_params, spin_flux
 
     sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
-    # sim.run()
+    sim.run()
+    E0 = sim.vacuum.Ex_array[:,0]
+    time = sim.time
+    plt.plot(time, E0)
+    plt.savefig("images/onething.jpg")
     # print(sim.mediums[1].arrays["Jx"][100,:,:,:])
     # print(sim.J_s[100,:]*0.068)
     
