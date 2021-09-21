@@ -33,11 +33,13 @@ class Simulation:
         vac = Vacuum(self.vac_p, self.sim_p, N_time, self.mediums)
         return vac
                             
-    def run(self):
+    def run(self, disp_progress = False):
         dt = self.sim_p["dt"]
         max_shift = floor(self.vacuum.min_max_delay[0][0])
         for t_i, t in enumerate(self.time):
             self.step(t_i, max_shift)
+            if disp_progress:
+                print(f"Step {t_i+1} of {len(self.time} completed")
 
     def step(self, t_i, max_shift):
         dt = self.sim_p["dt"]
@@ -74,8 +76,9 @@ class Simulation:
                 charge_flux = exc_reg * spin_flux * medium.params["theta"]
                 # print(charge_flux.shape)
                 for z_i, z in enumerate(self.vacuum.z):
+                    #print(f"Distance {z_i + 1} of {len(self.vacuum.z) + 1} started")
                     Ex = 0
-                    delta_t, delta_r = self.vacuum.time_delays[z_i][m_i], self.vacuum.source_vectors[z_i][m_i],
+                    delta_t, delta_r = self.vacuum.time_delays[z_i][m_i], self.vacuum.source_vectors[z_i][m_i]
                     for index, val in np.ndenumerate(delta_t):
                         # print("----")
                         x_i, y_i, z_i2 = index
@@ -86,7 +89,7 @@ class Simulation:
                         # print(charge_flux_xyz)
                         # raise ValueError
                         J_t = get_J_t(t_i_ret, dt, charge_flux_xyz)
-                        Ex += J_t*J_t_factor*dV
+                        Ex += -J_t*J_t_factor*dV/r
                     self.vacuum.Ex_array[t_i, z_i] = Ex
 
     def save_Ex(self, path):
@@ -332,8 +335,9 @@ if __name__ == "__main__":
     from input_params import sim_params, medium_params, vacuum_params, spin_flux
 
     sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
-    sim.run()
+    sim.run(disp_progress=True)
     E0 = sim.vacuum.Ex_array[:,0]
+    sim.save_Ex("testsave.out")
     time = sim.time
     plt.plot(time, E0)
     plt.savefig("images/onething.jpg")
