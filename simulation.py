@@ -12,6 +12,7 @@ class Simulation:
         self.med_p = medium_params
         self.vac_p = vacuum_params
         self.time = self.format_time()
+        self.interfaces = self.get_interfaces()
         self.mediums = self.get_mediums()
         self.vacuum = self.get_vacuum()
 
@@ -19,6 +20,10 @@ class Simulation:
         time = np.arange(0, self.spin_flux.shape[0], self.dt)
         return time
     
+    def get_interfaces(self):
+        interfaces = [p["z"][1] for p in self.med_p]
+        return interfaces
+
     def get_mediums(self):
         N_time = len(self.time)
         mediums = []
@@ -27,10 +32,10 @@ class Simulation:
             medium_spin_flux = self.spin_flux[:,z_0:z_end]
             mediums.append(Medium(medium, self.sim_p, medium_spin_flux))
         return mediums
-    
+
     def get_vacuum(self):
         N_time = len(self.time)
-        vac = Vacuum(self.vac_p, self.sim_p, N_time, self.mediums)
+        vac = Vacuum(self.vac_p, self.sim_p, N_time, self.mediums, self.interfaces)
         return vac
                             
     def run(self, disp_progress = False):
@@ -39,7 +44,7 @@ class Simulation:
         for t_i, t in enumerate(self.time):
             self.step(t_i, max_shift)
             if disp_progress:
-                print(f"Step {t_i+1} of {len(self.time} completed")
+                print(f"Step {t_i+1} of {len(self.time)} completed")
 
     def step(self, t_i, max_shift):
         dt = self.sim_p["dt"]
@@ -93,7 +98,7 @@ class Simulation:
                     self.vacuum.Ex_array[t_i, z_i] = Ex
 
     def save_Ex(self, path):
-        arr = sim.vacuum.Ex_array.copy()
+        arr = self.vacuum.Ex_array.copy()
         np.savetxt(path, arr)
 
 class Medium:
@@ -196,75 +201,75 @@ class Medium:
         else:
             return False
 
+class E_field:
+    def __init__(self, z, sim_params, mediums, N_time, interfaces):
+        self.z = z
+        self.Ex = np.zeros(N_time)
+        self.delta_r = self.get_delta_r(sim_params, mediums, interfaces)
+        self.delta_t = self.get_delta_t(mediums)
+
+    def get_delta_r(self, sim_params, mediums, interfaces):
+        all_delta_r = []
+        for m_i, medium in enumerate(mediums):
+            if not medium.use:
+                all_delta_r.append(None)
+            else:
+                x_min, x_max = medium.params["x"]
+                y_min, y_max = medium.params["y"]
+                z_min, z_max = medium.params["z"]
+                #delta_t = np.zeros(medium.N_points)
+                Nx, Ny, Nz = medium.N_points
+                delta_r = np.zeros((Nx,Ny,Nz, len(mediums)+1))
+                dx, dy, dz =  sim_params["dx"], sim_params["dy"], sim_params["dz"]
+                for (x_i,y_i,z_i), val in np.ndenumerate(delta_r[:,:,:,0]):
+                    x_s = x_min + x_i * dx
+                    y_s = y_min + y_i * dy
+                    z_s = z_min + z_i * dz
+                    r = get_r_tuple(x_s, y_s, z_s, self.z, interfaces)
+                    delta_r[x_i,y_i,z_i,:] = r
+                all_delta_r.append(delta_r)
+        return all_delta_r
+
+    def get_delta_t(self, mediums):
+        n = []
+        for medium in mediums:
+            n.append(medium.params["n"])
+        n.append(1)
+        all_delta_t = []
+        for arr in self.delta_r:
+            if arr is None:
+                all_delta_t.append(None)
+            else:
+                Nx,Ny,Nz,Nm = arr.shape
+                delta_t = np.zeros((Nx,Ny,Nz))
+                for (x_i, y_i, z_i), _ in np.ndenumerate(delta_t):
+                    tup = arr[x_i,y_i,z_i,:].copy()
+                    t = calc_delta_t(tup, n)
+                    delta_t[x_i,y_i,z_i] = t
+                t_min = np.amin(delta_t)
+                delta_t -= np.ones(delta_t.shape)*t_min
+                all_delta_t.append(delta_t)
+        return all_delta_t
+         
 class Vacuum:
-    def __init__(self, params, sim_params, N_time, mediums):
+    def __init__(self, params, sim_params, N_time, mediums, interfaces):
         self.params = params
         self.z = self.get_z_points()
-        self.Ex_array = self.get_array(N_time)
-        self.time_delays, self.source_vectors = self.get_time_and_source(sim_params, mediums)
-        self.min_max_delay = self.get_min_max_delay()
+        # self.absorption_regions = self.get_absorption_regions(mediums, sim_params)
+        self.E_fields = self.get_E_fields(sim_params, mediums, N_time, interfaces)
+        # self.Ex_array = self.get_array(N_time)
+        # self.time_delays, self.source_vectors = self.get_time_and_source(sim_params, mediums)
+        # self.min_max_delay = self.get_min_max_delay()
     
     def get_z_points(self):
         return self.params["z"]
 
-    def get_array(self, N_time):
-        arr = np.zeros((N_time, len(self.z)))
-        return arr
-
-    def get_time_and_source(self, sim_p, mediums):
-        mult_factor = 10**6 / 299792458  # Division by C and conversion from ns to fs
-        # print(mult_factor)
-        all_time_delays = []
-        all_source_vectors = []
+    def get_E_fields(self, sim_params, mediums, N_time, interfaces):
+        E_fields = []
         for z in self.z:
-            delta_t_max = False
-            time_delay_z =  [] 
-            source_vector_z = []
-            for medium in mediums:
-                if not medium.use:
-                    time_delay_z.append(None)
-                    source_vector_z.append(None)
-                else:
-                    x_min, x_max = medium.params["x"]
-                    y_min, y_max = medium.params["y"]
-                    z_min, z_max = medium.params["z"]
-                    delta_t = np.zeros(medium.N_points)
-                    delta_r = np.zeros(medium.N_points)
-                    dx, dy, dz =  sim_p["dx"], sim_p["dy"], sim_p["dz"]
-                    for index, val in np.ndenumerate(delta_t):
-                        delta_x = x_min + index[0] * dx
-                        delta_y = y_min + index[1] * dy
-                        delta_z = z - (z_min + index[2] * dz) 
-                        delta_r[index] = sqrt(delta_x**2 + delta_y**2 + delta_z**2)
-                        # source_vector[index] = delta_r
-                    
-                    delta_t = - delta_r * mult_factor
-                        
-                    time_delay_z.append(delta_t)
-                    source_vector_z.append(delta_r)
-                    medium_delta_t_max = np.amax(delta_t)
-                    if not delta_t_max:
-                        delta_t_max = medium_delta_t_max
-                    elif delta_t_max < medium_delta_t_max:
-                        delta_t_max = medium_delta_t_max
-            arr_type = type(np.zeros(1))
-            shifted_time_delay_z = []
-            for delta_t in time_delay_z:
-                if isinstance(delta_t, arr_type):
-                    # print("yo")
-                    s = delta_t.shape
-                    shift = np.ones(s) * delta_t_max
-                    # print(shift)
-                    # print(delta_t)
-                    shifted_delta_t = delta_t - shift
-                    # print(shifted_delta_t)
-                    shifted_time_delay_z.append(shifted_delta_t)
-                else:
-                    shifted_time_delay_z.append(None)
-            # print(shifted_time_delay_z)
-            all_time_delays.append(shifted_time_delay_z)
-            all_source_vectors.append(source_vector_z)
-        return all_time_delays, all_source_vectors
+            E = E_field(z, sim_params, mediums, N_time, interfaces)
+            E_fields.append(E)
+        return E_fields
 
     def get_min_max_delay(self):
         min_max_list = []
@@ -292,11 +297,6 @@ def get_J(t_i_ret, time_series):
     if t_i_ret <= 0 :
         return 0
     else:
-        # x_i, y_i, z_i = pos_index
-        # print(arr.shape)
-        # time_series = arr[:,x_i,y_i,z_i].copy()
-        # print(time_series.shape)
-        # print(time_series)
         if np.abs(t_i_ret - round(t_i_ret)) < 0.001:
             J = time_series[round(t_i_ret)]
         else:
@@ -307,6 +307,37 @@ def get_J(t_i_ret, time_series):
             else:
                 J = time_series[0]
         return J
+
+def get_r_tuple(x_s,y_s,z_s, z_target, interfaces):
+    r = []
+    for interface in interfaces:
+        if z_s < interface:
+            z_i = interface
+            factor = 1 - (z_i-z_s)/(z_target-z_s)
+            # print(factor)
+            y_i = y_s*factor
+            x_i = x_s*factor
+            delta_r = sqrt((z_i-z_s)**2 + (x_i-x_s)**2 + (y_i-y_s)**2)
+            r.append(delta_r)
+            z_s = z_i
+            y_s = y_i
+            x_s = x_i
+            # print(x_s, y_s, z_s)
+        else:
+            r.append(0)
+    delta_r = sqrt((z_s-z_target)**2 + x_s**2 + y_s**2)
+    r.append(delta_r)
+    return np.array(r)
+
+def calc_delta_t(r_tuple, n_real):
+    r_effective = 0
+    # factor = 1/(3 * 10**2)
+    for r, n in zip(r_tuple, n_real):
+        r_effective += r*n
+
+    t = r_effective/299 # Speed of light in [nm / fs]
+
+    return t
 
 def get_J_t(t_i_ret, dt, time_series):
     J_2 = get_J(t_i_ret, time_series)
@@ -335,15 +366,17 @@ if __name__ == "__main__":
     from input_params import sim_params, medium_params, vacuum_params, spin_flux
 
     sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
-    sim.run(disp_progress=True)
-    E0 = sim.vacuum.Ex_array[:,0]
-    sim.save_Ex("testsave.out")
-    time = sim.time
-    plt.plot(time, E0)
-    plt.savefig("images/onething.jpg")
+    print(sim.vacuum.E_fields[0].delta_r)
+    print(sim.vacuum.E_fields[0].delta_t[1])
+    print(sim.vacuum.E_fields[0].delta_t[1].shape)
+    # sim.run(disp_progress=True)
+    # E0 = sim.vacuum.Ex_array[:,0]
+    # sim.save_Ex("testsave.out")
+    # time = sim.time
+    # plt.plot(time, E0)
+    # plt.savefig("images/onething.jpg")
     # print(sim.mediums[1].arrays["Jx"][100,:,:,:])
     # print(sim.J_s[100,:]*0.068)
     
     # # print(sim.mediums[1].arrays)
-
 
