@@ -1,10 +1,11 @@
 import numpy as np
 import sys
-from math import sqrt, floor
+from math import sqrt, floor, ceil
 import matplotlib.pyplot as plt
 
 class Simulation:
-    def __init__(self, spin_flux, sim_params, medium_params, vacuum_params):
+    def __init__(self, spin_flux, sim_params, medium_params, vacuum_params, name = "No name"):
+        self.name = name
         self.spin_flux = spin_flux
         self.sim_p = sim_params
         self.jef_terms = self.sim_p["jef_terms"]
@@ -15,6 +16,7 @@ class Simulation:
         self.interfaces = self.get_interfaces()
         self.mediums = self.get_mediums()
         self.vacuum = self.get_vacuum()
+        
 
     def format_time(self):
         time = np.arange(0, self.spin_flux.shape[0], self.dt)
@@ -40,11 +42,13 @@ class Simulation:
                             
     def run(self, disp_progress = False):
         dt = self.sim_p["dt"]
-        max_shift = floor(self.vacuum.min_max_delay[0][0])
+        N10 = len(self.time)//10
+            
+        max_shift = ceil(self.vacuum.max_delta_t)
         for t_i, t in enumerate(self.time):
             self.step(t_i, max_shift)
-            if disp_progress:
-                print(f"Step {t_i+1} of {len(self.time)} completed")
+            if disp_progress and t_i % N10 == 0:
+                print(f"Simulation {}Step {t_i+1} of {len(self.time)} completed")
 
     def step(self, t_i, max_shift):
         dt = self.sim_p["dt"]
@@ -71,9 +75,7 @@ class Simulation:
 
             if medium.params["use_Jx"]:
                 J = np.zeros((t_len, Nx, Ny, Nz))
-                
-                # print(Nx, Ny, Nz)
-                # print(t_len)
+    
                 exc_reg = np.tile(medium.exc_region, (t_len, 1, 1, 1))
                 
                 spin_flux = medium.spin_flux[t_0:t_i+1,:].reshape((t_len, 1, 1, Nz))
@@ -107,7 +109,6 @@ class Medium:
         self.spin_flux = spin_flux
         self.format_domain(sim_params)
         self.N_points = self.get_N_points(sim_params)
-        # self.arrays = self.get_arrays(N_time)
         self.exc_region = self.get_excitation_region(sim_params)
         self.use = self.get_usage()
     
@@ -124,36 +125,9 @@ class Medium:
         Nz = N_points("z")
         return (Nx, Ny, Nz)
 
-    def get_arrays(self, N_time):
-        Nx, Ny, Nz = self.N_points
-        arrays = {}
-        
-        for coord in self.params["use_J"]:
-            if self.params["use_J"][coord]:
-                arrays[f"J{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-            else:
-                arrays[f"J{coord}"] = None
-        if self.params["use_rho"]:
-            arrays["rho"] = np.zeros((N_time, Nx,Ny,Nz))
-        else:
-            arrays["rho"] = None
-        for coord in ["x", "y", "z"]:
-            if self.params["use_field"]:
-                if self.params["use_field"][f"E{coord}"]:
-                    arrays[f"E{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-                else:
-                    arrays[f"E{coord}"] = None
-                if self.params["use_field"][f"B{coord}"]:
-                    arrays[f"B{coord}"] = np.zeros((N_time, Nx,Ny,Nz))
-                else:
-                    arrays[f"B{coord}"] = None
-        
-        return arrays
-
     def get_excitation_region(self, sim_p):
         Nx, Ny, Nz = self.N_points
         exc_region = sim_p["exc_region"]
-        
         x_min, x_max = self.params["x"]
         y_min, y_max = self.params["y"]
         dx = sim_p["dx"]
@@ -201,12 +175,37 @@ class Medium:
         else:
             return False
 
+class Vacuum:
+    def __init__(self, params, sim_params, N_time, mediums, interfaces):
+        self.params = params
+        self.z = self.get_z_points()
+        self.E_fields = self.get_E_fields(sim_params, mediums, N_time, interfaces)
+        self.max_delta_t = self.get_max_delta_t()
+        
+    def get_z_points(self):
+        return self.params["z"]
+
+    def get_E_fields(self, sim_params, mediums, N_time, interfaces):
+        E_fields = []
+        
+        for z in self.z:
+            E = E_field(z, sim_params, mediums, N_time, interfaces)
+            E_fields.append(E)
+        return E_fields
+
+    def get_max_delta_t(self):
+        maxes =[]
+        for E in self.E_fields:
+            maxes.append(E.delta_t_max)
+        return max(maxes)
+
 class E_field:
     def __init__(self, z, sim_params, mediums, N_time, interfaces):
         self.z = z
         self.Ex = np.zeros(N_time)
         self.delta_r = self.get_delta_r(sim_params, mediums, interfaces)
         self.delta_t = self.get_delta_t(mediums)
+        self.delta_t_max = np.amax(self.delta_t)
 
     def get_delta_r(self, sim_params, mediums, interfaces):
         all_delta_r = []
@@ -250,48 +249,7 @@ class E_field:
                 delta_t -= np.ones(delta_t.shape)*t_min
                 all_delta_t.append(delta_t)
         return all_delta_t
-         
-class Vacuum:
-    def __init__(self, params, sim_params, N_time, mediums, interfaces):
-        self.params = params
-        self.z = self.get_z_points()
-        # self.absorption_regions = self.get_absorption_regions(mediums, sim_params)
-        self.E_fields = self.get_E_fields(sim_params, mediums, N_time, interfaces)
-        # self.Ex_array = self.get_array(N_time)
-        # self.time_delays, self.source_vectors = self.get_time_and_source(sim_params, mediums)
-        # self.min_max_delay = self.get_min_max_delay()
-    
-    def get_z_points(self):
-        return self.params["z"]
 
-    def get_E_fields(self, sim_params, mediums, N_time, interfaces):
-        E_fields = []
-        for z in self.z:
-            E = E_field(z, sim_params, mediums, N_time, interfaces)
-            E_fields.append(E)
-        return E_fields
-
-    def get_min_max_delay(self):
-        min_max_list = []
-        arr_type = type(np.zeros(1))
-        for time_delay_z in self.time_delays:
-            no_value = True
-            for medium_delay in time_delay_z:
-                if isinstance(medium_delay, arr_type):
-                    medium_min = np.amin(medium_delay)
-                    medium_max = np.amax(medium_delay)
-                    if no_value:
-                        min, max = medium_min, medium_max
-                        no_value = False
-                    else:
-                        if medium_min < min:
-                            min = medium_min
-                        if medium_max > max:
-                            max = medium_max
-            min_max_list.append((min, max))
-        
-        # print(min_max_list)
-        return min_max_list
 
 def get_J(t_i_ret, time_series):
     if t_i_ret <= 0 :
@@ -341,7 +299,7 @@ def calc_delta_t(r_tuple, n_real):
 
 def get_J_t(t_i_ret, dt, time_series):
     J_2 = get_J(t_i_ret, time_series)
-    J_1 = get_J(t_i_ret - 1, time_series)
+    J_1 = get_J(t_i_ret - 1, time_series)                                                                                                                                                 
     J_0 = get_J(t_i_ret - 2, time_series)
     J_t = back_diff2(J_2, J_1, J_0, dt)
     return J_t
@@ -366,9 +324,9 @@ if __name__ == "__main__":
     from input_params import sim_params, medium_params, vacuum_params, spin_flux
 
     sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
-    print(sim.vacuum.E_fields[0].delta_r)
-    print(sim.vacuum.E_fields[0].delta_t[1])
-    print(sim.vacuum.E_fields[0].delta_t[1].shape)
+    # print(sim.vacuum.E_fields[0].delta_r)
+    # print(sim.vacuum.E_fields[0].delta_t[1])
+    # print(sim.vacuum.E_fields[0].delta_t[1].shape)
     # sim.run(disp_progress=True)
     # E0 = sim.vacuum.Ex_array[:,0]
     # sim.save_Ex("testsave.out")
