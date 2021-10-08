@@ -1,31 +1,27 @@
-from math import ldexp
+from math import sqrt
 import numpy as np
-# import matplotlib.pyplot as plt
 
-# arr1 = np.loadtxt("data/FePt_bilayer-open/output/ntotal_up.out")
-# arr2 = np.loadtxt("data/FePt_bilayer-open/output/ntotal_down.out")
+def get_r_tuple(x_s,y_s,z_s, z_target, absorption_regions):
+    r = []
+    for region in absorption_regions:
+        if z_s < region[1]:
+            z_i = region[1]
+            factor = -(z_i-z_s)/(z_target-z_s)
+            y_i = y_s*factor
+            x_i = x_s*factor
+            delta_r = sqrt((z_i-z_s)**2 + (x_i-x_s)**2 + (y_i-y_s)**2)
+            r.append(delta_r)
+            z_s = z_i
+            y_s = y_i
+            x_s = x_i
+        else:
+            r.append(None)
+    delta_r = sqrt((z_s-z_target)**2 + x_s**2 + y_s**2)
+    r.append(delta_r)
+    return np.array(delta_r)
 
-# arr_tot = arr1 - arr2
-
-# fig = plt.plot(arr_tot)
-
-# print(len(fig))
-# plt.savefig("arr_tot.jpg")
-# plt.close()
-
-# arr_flux = np.loadtxt("data/FePt_bilayer-open/flux.out")
-# one_layer = arr_flux[:,4]
-# # print(arr_flux[0:5,:])
-# # print(np.gradient(arr_flux)[0][0:5,:])
-# plt.plot(one_layer)
-# plt.savefig("one_layer_flux.jpg")
-
-# grad = np.gradient(arr_flux, axis = 0)
-# one_grad = grad[:,4]
-# plt.close()
-# plt.plot(one_grad)
-# plt.savefig("One_grad.jpg")
-
-from math import sqrt, floor
-
-print(type(floor(-0.1)))
+x_s, y_s, z_s = 10,10,10
+z_target = 30
+absorption_regions = [(0,5,4), (5,12,3), (12,17, 4)]
+r = get_r_tuple(x_s, y_s, z_s, z_target, absorption_regions)
+print(r)

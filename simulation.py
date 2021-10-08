@@ -255,12 +255,8 @@ class Vacuum:
     def __init__(self, params, sim_params, N_time, mediums, interfaces):
         self.params = params
         self.z = self.get_z_points()
-        # self.absorption_regions = self.get_absorption_regions(mediums, sim_params)
         self.E_fields = self.get_E_fields(sim_params, mediums, N_time, interfaces)
-        # self.Ex_array = self.get_array(N_time)
-        # self.time_delays, self.source_vectors = self.get_time_and_source(sim_params, mediums)
-        # self.min_max_delay = self.get_min_max_delay()
-    
+
     def get_z_points(self):
         return self.params["z"]
 
