@@ -2,6 +2,8 @@ import numpy as np
 import sys
 from math import sqrt, floor, ceil
 import matplotlib.pyplot as plt
+from E_fieldSimulation.help_functions import (get_J, get_J_t, get_r_tuple, 
+            back_diff1, back_diff2, interpolation, calc_delta_t)
 
 class Simulation:
     def __init__(self, spin_flux, sim_params, medium_params, vacuum_params, name = "No name"):
@@ -16,7 +18,6 @@ class Simulation:
         self.interfaces = self.get_interfaces()
         self.mediums = self.get_mediums()
         self.vacuum = self.get_vacuum()
-        
 
     def format_time(self):
         time = np.arange(0, self.spin_flux.shape[0], self.dt)
@@ -27,7 +28,6 @@ class Simulation:
         return interfaces
 
     def get_mediums(self):
-        N_time = len(self.time)
         mediums = []
         for medium in self.med_p:
             z_0, z_end = medium["z"]
@@ -43,25 +43,26 @@ class Simulation:
     def run(self, disp_progress = False):
         dt = self.sim_p["dt"]
         N10 = len(self.time)//10
-            
+        p = -10
         max_shift = ceil(self.vacuum.max_delta_t)
         for t_i, t in enumerate(self.time):
             self.step(t_i, max_shift)
             if disp_progress and t_i % N10 == 0:
-                print(f"Simulation {}Step {t_i+1} of {len(self.time)} completed")
+                p += 10
+                print(f"Simulation {self.name}\n{p} % completed\n----------")
+        if disp_progress:
+            print(f"Simulation {self.name} completed\n----------")
 
     def step(self, t_i, max_shift):
         dt = self.sim_p["dt"]
         t = t_i * dt
         dV = self.sim_p["dx"] * self.sim_p["dy"] * self.sim_p["dz"]
-        t_0 = t_i + max_shift - 2
+        t_0 = t_i - max_shift - 2
         t_0 = 0 if t_0 < 0 else t_0
         t_len = t_i - t_0 + 1
         
         J_t_factor = 16022   # prefactor of Jefimenkos equations, converting from particle, nm, fs
                                     # to Coulomb, meter, second
-        if self.jef_terms["rho"] or self.jef_terms["rho_t"]:
-            use_dist = True
 
         for m_i, medium in enumerate(self.mediums):
             
@@ -70,37 +71,33 @@ class Simulation:
 
             if medium.params["use_rho"]:
                 pass
-                # J_rho = ...
-
 
             if medium.params["use_Jx"]:
-                J = np.zeros((t_len, Nx, Ny, Nz))
-    
+                # J = np.zeros((t_len, Nx, Ny, Nz))
                 exc_reg = np.tile(medium.exc_region, (t_len, 1, 1, 1))
-                
                 spin_flux = medium.spin_flux[t_0:t_i+1,:].reshape((t_len, 1, 1, Nz))
-                # print(spin_flux)
                 charge_flux = exc_reg * spin_flux * medium.params["theta"]
-                # print(charge_flux.shape)
-                for z_i, z in enumerate(self.vacuum.z):
-                    #print(f"Distance {z_i + 1} of {len(self.vacuum.z) + 1} started")
+                for E in self.vacuum.E_fields:
+                    if E.delta_r[m_i] is None:
+                        continue
                     Ex = 0
-                    delta_t, delta_r = self.vacuum.time_delays[z_i][m_i], self.vacuum.source_vectors[z_i][m_i]
-                    for index, val in np.ndenumerate(delta_t):
-                        # print("----")
-                        x_i, y_i, z_i2 = index
-                        t_shift = delta_t[index]
-                        r = delta_r[index]
-                        t_i_ret = (t_len - 1 + t_shift)/dt
-                        charge_flux_xyz = charge_flux[:,x_i, y_i, z_i2].copy().flatten()
-                        # print(charge_flux_xyz)
-                        # raise ValueError
+                    delta_t, delta_r_tot = E.delta_t[m_i], E.delta_r_tot[m_i]
+                    # z_target = E.z
+                    for index, t_shift in np.ndenumerate(delta_t):
+                        x_i, y_i, z_i = index
+                        r = delta_r_tot[index]
+                        t_i_ret = (t_len - 1 - t_shift)/dt
+                        charge_flux_xyz = charge_flux[:,x_i, y_i, z_i].copy().flatten()
                         J_t = get_J_t(t_i_ret, dt, charge_flux_xyz)
                         Ex += -J_t*J_t_factor*dV/r
-                    self.vacuum.Ex_array[t_i, z_i] = Ex
+                    E.Ex[t_i] = Ex
 
     def save_Ex(self, path):
-        arr = self.vacuum.Ex_array.copy()
+        all_arrs = []
+        for E in self.vacuum.E_fields:
+            E_data = E.Ex.copy().reshape((1,-1))
+            all_arrs.append(E_data)
+        arr = np.array(all_arrs)
         np.savetxt(path, arr)
 
 class Medium:
@@ -204,15 +201,13 @@ class E_field:
         self.z = z
         self.Ex = np.zeros(N_time)
         self.delta_r = self.get_delta_r(sim_params, mediums, interfaces)
-        self.delta_t = self.get_delta_t(mediums)
-        self.delta_t_max = np.amax(self.delta_t)
+        self.delta_r_tot = self.get_delta_r_tot()
+        self.delta_t, self.delta_t_max = self.get_delta_t(mediums)
 
     def get_delta_r(self, sim_params, mediums, interfaces):
         all_delta_r = []
         for m_i, medium in enumerate(mediums):
-            if not medium.use:
-                all_delta_r.append(None)
-            else:
+            if medium.use:
                 x_min, x_max = medium.params["x"]
                 y_min, y_max = medium.params["y"]
                 z_min, z_max = medium.params["z"]
@@ -227,7 +222,22 @@ class E_field:
                     r = get_r_tuple(x_s, y_s, z_s, self.z, interfaces)
                     delta_r[x_i,y_i,z_i,:] = r
                 all_delta_r.append(delta_r)
+            else:
+                all_delta_r.append(None)
         return all_delta_r
+
+    def get_delta_r_tot(self):
+        all_delta_r_tot = []
+        for delta_r in self.delta_r:
+            if delta_r is None:
+                all_delta_r_tot.append(None)
+            else:
+                r_array = np.zeros(delta_r[:,:,:,0].shape)
+                for (xi,yi,zi), _ in np.ndenumerate(delta_r[:,:,:,0]):
+                    r_tot = np.sum(delta_r[xi,yi,zi,:])
+                    r_array[xi,yi,zi] = r_tot
+                all_delta_r_tot.append(r_array)
+        return all_delta_r_tot
 
     def get_delta_t(self, mediums):
         n = []
@@ -235,6 +245,7 @@ class E_field:
             n.append(medium.params["n"])
         n.append(1)
         all_delta_t = []
+        delta_t_maxes = []
         for arr in self.delta_r:
             if arr is None:
                 all_delta_t.append(None)
@@ -248,93 +259,80 @@ class E_field:
                 t_min = np.amin(delta_t)
                 delta_t -= np.ones(delta_t.shape)*t_min
                 all_delta_t.append(delta_t)
-        return all_delta_t
+                delta_t_maxes.append(np.amax(delta_t))
+        delta_t_max = max(delta_t_maxes)
 
+        return all_delta_t, delta_t_max
 
-def get_J(t_i_ret, time_series):
-    if t_i_ret <= 0 :
-        return 0
-    else:
-        if np.abs(t_i_ret - round(t_i_ret)) < 0.001:
-            J = time_series[round(t_i_ret)]
-        else:
-            num = t_i_ret % 1
-            t_0, t_1 = round(t_i_ret - num), round(t_i_ret-num + 1)
-            if len(time_series) > 1:
-                J = interpolation(time_series[t_0], time_series[t_1], num)
-            else:
-                J = time_series[0]
-        return J
+# def get_J(t_i_ret, time_series):
+#     if t_i_ret <= 0 :
+#         return 0
+#     else:
+#         if np.abs(t_i_ret - round(t_i_ret)) < 0.001:
+#             J = time_series[round(t_i_ret)]
+#         else:
+#             num = t_i_ret % 1
+#             t_0, t_1 = round(t_i_ret - num), round(t_i_ret-num + 1)
+#             if len(time_series) > 1:
+#                 J = interpolation(time_series[t_0], time_series[t_1], num)
+#             else:
+#                 J = time_series[0]
+#         return J
 
-def get_r_tuple(x_s,y_s,z_s, z_target, interfaces):
-    r = []
-    for interface in interfaces:
-        if z_s < interface:
-            z_i = interface
-            factor = 1 - (z_i-z_s)/(z_target-z_s)
-            # print(factor)
-            y_i = y_s*factor
-            x_i = x_s*factor
-            delta_r = sqrt((z_i-z_s)**2 + (x_i-x_s)**2 + (y_i-y_s)**2)
-            r.append(delta_r)
-            z_s = z_i
-            y_s = y_i
-            x_s = x_i
-            # print(x_s, y_s, z_s)
-        else:
-            r.append(0)
-    delta_r = sqrt((z_s-z_target)**2 + x_s**2 + y_s**2)
-    r.append(delta_r)
-    return np.array(r)
+# def get_r_tuple(x_s,y_s,z_s, z_target, interfaces):
+#     r = []
+#     for interface in interfaces:
+#         if z_s < interface:
+#             z_i = interface
+#             factor = 1 - (z_i-z_s)/(z_target-z_s)
+#             # print(factor)
+#             y_i = y_s*factor
+#             x_i = x_s*factor
+#             delta_r = sqrt((z_i-z_s)**2 + (x_i-x_s)**2 + (y_i-y_s)**2)
+#             r.append(delta_r)
+#             z_s = z_i
+#             y_s = y_i
+#             x_s = x_i
+#             # print(x_s, y_s, z_s)
+#         else:
+#             r.append(0)
+#     delta_r = sqrt((z_s-z_target)**2 + x_s**2 + y_s**2)
+#     r.append(delta_r)
+#     return np.array(r)
 
-def calc_delta_t(r_tuple, n_real):
-    r_effective = 0
-    # factor = 1/(3 * 10**2)
-    for r, n in zip(r_tuple, n_real):
-        r_effective += r*n
+# def calc_delta_t(r_tuple, n_real):
+#     r_effective = 0
+#     for r, n in zip(r_tuple, n_real):
+#         r_effective += r*n
+#     t = r_effective/299 # Speed of light in [nm / fs]
 
-    t = r_effective/299 # Speed of light in [nm / fs]
+#     return t
 
-    return t
+# def get_J_t(t_i_ret, dt, time_series):
+#     J_2 = get_J(t_i_ret, time_series)
+#     J_1 = get_J(t_i_ret - 1, time_series)                                                                                                                                                 
+#     J_0 = get_J(t_i_ret - 2, time_series)
+#     J_t = back_diff2(J_2, J_1, J_0, dt)
+#     return J_t
 
-def get_J_t(t_i_ret, dt, time_series):
-    J_2 = get_J(t_i_ret, time_series)
-    J_1 = get_J(t_i_ret - 1, time_series)                                                                                                                                                 
-    J_0 = get_J(t_i_ret - 2, time_series)
-    J_t = back_diff2(J_2, J_1, J_0, dt)
-    return J_t
+# def interpolation(val1, val2, number):
+#     if (number < 0) or (number > 1):
+#         raise ValueError("number must be in interval [0,1]")
+#     num = val1 + number*(val1 - val2)
+#     return num
 
-def interpolation(val1, val2, number):
-    if (number < 0) or (number > 1):
-        raise ValueError("number must be in interval [0,1]")
-    num = val1 + number*(val1 - val2)
-    return num
+# def back_diff1(y1, y0, dt):
+#     yprim = (y1 -y0)/dt
+#     return yprim
 
-def back_diff1(y1, y0, dt):
-    yprim = (y1 -y0)/dt
-    return yprim
-
-def back_diff2(y2, y1, y0, dt):
-    yprim = (1.5*y2 - 2*y1 + 0.5*y0)/dt
-    return yprim
+# def back_diff2(y2, y1, y0, dt):
+#     yprim = (1.5*y2 - 2*y1 + 0.5*y0)/dt
+#     return yprim
 
 if __name__ == "__main__":
-    # np.set_printoptions(precision=0)
     
     from input_params import sim_params, medium_params, vacuum_params, spin_flux
 
     sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
-    # print(sim.vacuum.E_fields[0].delta_r)
-    # print(sim.vacuum.E_fields[0].delta_t[1])
-    # print(sim.vacuum.E_fields[0].delta_t[1].shape)
-    # sim.run(disp_progress=True)
-    # E0 = sim.vacuum.Ex_array[:,0]
-    # sim.save_Ex("testsave.out")
-    # time = sim.time
-    # plt.plot(time, E0)
-    # plt.savefig("images/onething.jpg")
-    # print(sim.mediums[1].arrays["Jx"][100,:,:,:])
-    # print(sim.J_s[100,:]*0.068)
+    sim.run(disp_progress=True)
     
-    # # print(sim.mediums[1].arrays)
-
