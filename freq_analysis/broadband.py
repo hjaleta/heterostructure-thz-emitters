@@ -125,7 +125,7 @@ class Signal():
         ax.set_title("Frequency Spectra")
         text_x = (self.freq[i_min] * 2 + self.freq[i_max]) / 3
         text_y = np.amax(self.E_f_abs)/3
-        ax.text(text_x, text_y, f"Bandwidth: {self.bandwidth} THz", ha = "center", fontsize = 12)
+        ax.text(text_x, text_y, f"Bandwidth: {self.bandwidth:.2f} THz", ha = "center", fontsize = 12)
     
         if figpath != "None":
             if figpath[-4:] != ".png":

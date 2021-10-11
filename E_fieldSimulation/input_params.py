@@ -16,7 +16,7 @@ medium_params = [
     "use_Jx": False, "use_Jy": False, "use_Jz": False, 
     "use_rho":False, 
     "use_field": False,
-     "theta":0, "mu":0, "n":1},
+    "theta":0, "mu":0, "n":1},
 
     {"material":"Pt",
     "x": (-1000, 1000), "y":(-1000, 1000), "z": (6,11),
@@ -26,10 +26,7 @@ medium_params = [
     "theta":0.068, "mu": 0, "n": 70}
     ]
 
-# z_points = np.array([1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000]) * 100 # distances z for E(z,t) ranging between 0.1 um and 10 cm
-z_points = np.array([1, 100, 10000, 10**6]) * 100 # distances z for E(z,t) ranging between 0.1 um and 10 cm
-z_points = np.array([10**2])
-
+z_points = np.array([10**8])
 
 vacuum_params =  {
     "label":"vacuum",
