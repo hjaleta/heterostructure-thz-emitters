@@ -7,10 +7,11 @@ import sys
 
 spin_source_folder = "test_pipeline/Spin Currents"
 sim_folder = "test_pipeline/Simulation Results"
+params_py_path = "E_fieldSimulation/input_params.py"
 
 check_source_folders = True
 build_sim_params = True
-run_simulation = False
+run_simulation = True
 
 sim_time = 600
 signal_params = {"padfactor":9, "n_interpol":1, "dt":1, "bb_fraction": 10}
@@ -23,18 +24,32 @@ if check_source_folders:
         print(f"All {len(complete)} folders have a valid flux.out file")
 
 if build_sim_params:
-    pass
+    build_simulation_setup(spin_source_folder, sim_folder, params_py_path)
 
 if run_simulation:
-    
     N_simulations = len(os.listdir(sim_folder))
     for folder in os.listdir(sim_folder):
-        folderpath = "/".join( [sim_folder, folder])
-        sys.path.append(folderpath)
+        source_folderpath = "/".join( [spin_source_folder, folder])
+        result_folderpath = "/".join( [sim_folder, folder])
+        sys.path.append(source_folderpath)
         from input_params import sim_params, medium_params, vacuum_params, spin_flux
-        sys.path.remove(folderpath)
+        # print(spin_flux.shape)
+        sys.path.remove(source_folderpath)
+        spin_flux = spin_flux[:600,:]
+        # print(spin_flux)
         sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params, name = folder)
-        sim.run(print_progress=True)
+        print(medium_params)
+        sim.run()
         for E in sim.vacuum.E_fields:
+            # print(E.Ex)
             signal = Signal(E.Ex, signal_params)
-            BW_plot_path = "/".join([folderpath, f"Signal z = {E.z:.2E} BW.png" ])
+            filepath = "/".join([result_folderpath, f"Signal z = {E.z:.2E} nm "])
+            fourier_plot_path = filepath + "spectra.png"
+            BW_plot_path = filepath + "BW.png"
+            transient_plot_path = filepath + "transient.png"
+            json_path = filepath + "data.json"
+            signal.plot_BW(BW_plot_path)
+            signal.plot_signal(transient_plot_path)
+            signal.plot_fourier(fourier_plot_path)
+            signal.export_json(json_path)
+

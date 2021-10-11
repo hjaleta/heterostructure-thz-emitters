@@ -1,4 +1,3 @@
-
 import os
 import shutil
 
@@ -29,10 +28,6 @@ def build_inputdat(source_path, new_path, params):
     lines[28] = interfaces
     lines[30] = material_string
     lines[38] = laser
-    
-#     for i, line in enumerate(lines):
-#         print(f"{i}) " + line)
-    
     
     new_file_string = "\n".join(lines)
     new_file = open(new_path,"w")
@@ -128,8 +123,6 @@ def build_all_folders(param_combos, parent_path, source_path):
     for params in params_list:
         input_path = params_to_path(parent_path, params)
         build_one_folder(input_path, source_path, params)
-
-
 
 if __name__ == "__main__":
 

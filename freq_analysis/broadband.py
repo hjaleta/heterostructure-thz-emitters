@@ -86,11 +86,19 @@ class Signal():
         bb_freq = (i_min, i_max, fmin, fmax)
         return delta_f, bb_freq
         
-    def plot_fourier(self):
-        plt.figure()
-        plt.plot(self.freq, self.E_f_abs)
-        plt.xscale("log")
-        plt.yscale("log")
+    def plot_fourier(self, figpath = "None"):
+        fig, ax = plt.subplots()
+        ax.plot(self.freq, self.E_f_abs)
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel("Frequency [THz]")
+        ax.set_ylabel("E-field [N/C]")
+        ax.set_title("Frequency Spectra")
+
+        if figpath != "None":
+            if figpath[-4:] != ".png":
+                figpath += ".png"
+            fig.savefig(figpath)
 
     def plot_signal(self, figpath = "None"):
         fig, ax = plt.subplots()

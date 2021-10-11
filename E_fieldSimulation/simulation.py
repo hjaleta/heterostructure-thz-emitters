@@ -30,7 +30,9 @@ class Simulation:
     def get_mediums(self):
         mediums = []
         for medium in self.med_p:
+            print(medium)
             z_0, z_end = medium["z"]
+            print(z_0,z_end)
             medium_spin_flux = self.spin_flux[:,z_0:z_end]
             mediums.append(Medium(medium, self.sim_p, medium_spin_flux))
         return mediums
@@ -40,17 +42,17 @@ class Simulation:
         vac = Vacuum(self.vac_p, self.sim_p, N_time, self.mediums, self.interfaces)
         return vac
                             
-    def run(self, disp_progress = False):
+    def run(self, print_progress = False):
         dt = self.sim_p["dt"]
         N10 = len(self.time)//10
         p = -10
         max_shift = ceil(self.vacuum.max_delta_t)
         for t_i, t in enumerate(self.time):
             self.step(t_i, max_shift)
-            if disp_progress and t_i % N10 == 0:
+            if print_progress and t_i % N10 == 0:
                 p += 10
                 print(f"Simulation {self.name}\n{p} % completed\n----------")
-        if disp_progress:
+        if print_progress:
             print(f"Simulation {self.name} completed\n----------")
 
     def step(self, t_i, max_shift):
@@ -73,10 +75,12 @@ class Simulation:
                 pass
 
             if medium.params["use_Jx"]:
+                # print("WOO")
                 # J = np.zeros((t_len, Nx, Ny, Nz))
                 exc_reg = np.tile(medium.exc_region, (t_len, 1, 1, 1))
                 spin_flux = medium.spin_flux[t_0:t_i+1,:].reshape((t_len, 1, 1, Nz))
                 charge_flux = exc_reg * spin_flux * medium.params["theta"]
+                # print(np.sum(charge_flux, axis = 1))
                 for E in self.vacuum.E_fields:
                     if E.delta_r[m_i] is None:
                         continue
@@ -89,8 +93,10 @@ class Simulation:
                         t_i_ret = (t_len - 1 - t_shift)/dt
                         charge_flux_xyz = charge_flux[:,x_i, y_i, z_i].copy().flatten()
                         J_t = get_J_t(t_i_ret, dt, charge_flux_xyz)
+                        # print(J_t)
                         Ex += -J_t*J_t_factor*dV/r
                     E.Ex[t_i] = Ex
+                    # print(Ex)
 
     def save_Ex(self, path):
         all_arrs = []

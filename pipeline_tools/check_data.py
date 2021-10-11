@@ -26,7 +26,7 @@ def check_flux(folder_rootdir, expected_flux_time):#, remove, newdir):
     incomplete_folders = []
     
     for folder in os.listdir(folder_rootdir):
-        folderpath = folder_rootdir+folder
+        folderpath = "/".join([folder_rootdir,folder])
         for f in os.listdir(folderpath):
             if f == "flux.out":
                 try:
