@@ -104,7 +104,7 @@ class Signal():
                 figpath += ".png"
             fig.savefig(figpath)
         
-    def plot_bb(self, figpath = "None"):
+    def plot_BW(self, figpath = "None"):
 
         f_margin = 10
         i_min, i_max = self.bb_freq[0], self.bb_freq[1]
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     S = Signal(E,params)
     # S.plot_fourier()
     S.plot_signal()
-    S.plot_bb()
+    S.plot_BW()
     print(S.freq[:5], S.freq[-5:])
 
 

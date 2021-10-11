@@ -27,10 +27,10 @@ def check_flux(folder_rootdir, expected_flux_time):#, remove, newdir):
     
     for folder in os.listdir(folder_rootdir):
         folderpath = folder_rootdir+folder
-        for file in os.listdir(folderpath):
-            if file == "flux.out":
+        for f in os.listdir(folderpath):
+            if f == "flux.out":
                 try:
-                    arr = np.loadtxt(folder_rootdir + "/" + folder + "/" + file)
+                    arr = np.loadtxt(folder_rootdir + "/" + folder + "/" + f)
                     t = arr.shape[0]
                     if t >= expected_flux_time:
                         complete_folders.append(folder)
@@ -47,7 +47,7 @@ def delete_filetype(parent_dir, file_names:list):
         for f in files:
             for ext in file_names:
                 if f[-len(ext):] == ext:
-                    file_death_note.append("/".join([dirpath,file]))
+                    file_death_note.append("/".join([dirpath,f]))
     for f in file_death_note:
         os.remove(f)
 
