@@ -1,12 +1,13 @@
 import numpy as np
 import sys
+from time import perf_counter
 from math import sqrt, floor, ceil
 import matplotlib.pyplot as plt
 from E_fieldSimulation.help_functions import (get_J, get_J_t, get_r_tuple, 
             back_diff1, back_diff2, interpolation, calc_delta_t)
 
 class Simulation:
-    def __init__(self, spin_flux, sim_params, medium_params, vacuum_params, name = "No name"):
+    def __init__(self, spin_flux, sim_params, medium_params, vacuum_params, name = ""):
         self.name = name
         self.spin_flux = spin_flux
         self.sim_p = sim_params
@@ -42,18 +43,24 @@ class Simulation:
         vac = Vacuum(self.vac_p, self.sim_p, N_time, self.mediums, self.interfaces)
         return vac
                             
-    def run(self, print_progress = False):
+    def run(self, print_percent = False):
+        first_time = perf_counter()
+        
         dt = self.sim_p["dt"]
-        N10 = len(self.time)//10
-        p = -10
+        if print_percent:
+            percent_step = ceil((len(self.time)*print_percent)/100)
+        percent = -print_percent
         max_shift = ceil(self.vacuum.max_delta_t)
         for t_i, t in enumerate(self.time):
+            
             self.step(t_i, max_shift)
-            if print_progress and t_i % N10 == 0:
-                p += 10
-                print(f"Simulation {self.name}\n{p} % completed\n----------")
-        if print_progress:
-            print(f"Simulation {self.name} completed\n----------")
+            if print_percent and t_i % percent_step == 0:
+                percent += print_percent
+                print(f"Simulation {self.name}\n{percent} % completed")
+                current_time = perf_counter()
+                print(f"Total simulation time: {current_time - first_time} s\n----------")
+        current_time = perf_counter()
+        print(f"Simulation {self.name} completed in {current_time-first_time} s\n----------")
 
     def step(self, t_i, max_shift):
         dt = self.sim_p["dt"]

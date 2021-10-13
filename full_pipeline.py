@@ -3,12 +3,13 @@ from freq_analysis.broadband import Signal
 from pipeline_tools.check_data import check_folders, check_flux
 from pipeline_tools.build_simulation_input import build_simulation_setup, build_param_json, decode_json_params
 import os
-import sys
 
 spin_source_folder = "test_pipeline/Spin Currents"
 sim_folder = "test_pipeline/Simulation Results"
-params_py_path = "E_fieldSimulation/input_params.py"
-json_source_path = "E_fieldSimulation/input_params.json"
+
+# spin_source_folder = "Full Simulation/Spin Current Data/FuPt-closed"
+# sim_folder = "Full Simulation/Simulation Results/FuPt-closed"
+json_source_path = "Full Simulation/input_params.json"
 
 check_source_folders = True
 build_sim_params = True
@@ -33,15 +34,13 @@ if run_simulation:
         source_folderpath = "/".join( [spin_source_folder, folder])
         result_folderpath = "/".join( [sim_folder, folder])
         param_path = "/".join([source_folderpath, "input_params.json"])
-       
         sim_params, medium_params, vacuum_params, spin_flux = decode_json_params(param_path, sim_time)
-        # print(spin_flux)
         sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params, name = folder)
         print(medium_params)
-        sim.run()
+        sim.run(print_percent = 1)
         for E in sim.vacuum.E_fields:
             # print(E.Ex)
-            signal = Signal(E.Ex, signal_params)
+            signal = Signal(E.Ex, signal_params, E.z, sim.name)
             filepath = "/".join([result_folderpath, f"Signal z = {E.z:.2E} nm "])
             fourier_plot_path = filepath + "spectra.png"
             BW_plot_path = filepath + "BW.png"
@@ -51,4 +50,4 @@ if run_simulation:
             signal.plot_signal(transient_plot_path)
             signal.plot_fourier(fourier_plot_path)
             signal.export_json(json_path)
-
+        

@@ -6,7 +6,9 @@ import pandas as pd
 import json
 
 class Signal():
-    def __init__(self, E, params):
+    def __init__(self, E, params, z, name = "None"):
+        self.z = z
+        self.name = name
         self.unpack_params(params)
         self.check_params()
         self.t_org, self.E_org = self.get_original_signal(E)
@@ -93,7 +95,7 @@ class Signal():
         ax.set_yscale("log")
         ax.set_xlabel("Frequency [THz]")
         ax.set_ylabel("E-field [N/C]")
-        ax.set_title("Frequency Spectra")
+        ax.set_title(f"Frequency Spectra - {self.name}")
 
         if figpath != "None":
             if figpath[-4:] != ".png":
@@ -105,7 +107,7 @@ class Signal():
         ax.plot(self.t_org, self.E_org)
         ax.set_xlabel("Time [fs]")
         ax.set_ylabel("E-field [N/C]")
-        ax.set_title("Transient Signal")
+        ax.set_title("Transient Signal - {self.name}")
 
         if figpath != "None":
             if figpath[-4:] != ".png":
@@ -130,7 +132,7 @@ class Signal():
         ax.plot(self.freq[plot_min:plot_max], self.E_f_abs[plot_min:plot_max])
         ax.set_xlabel("Frequency [THz]")
         ax.set_ylabel("E-field [N/C]")
-        ax.set_title("Frequency Spectra")
+        ax.set_title("Frequency Spectra - {self.name}")
         text_x = (self.freq[i_min] * 2 + self.freq[i_max]) / 3
         text_y = np.amax(self.E_f_abs)/3
         ax.text(text_x, text_y, f"Bandwidth: {self.bandwidth:.2f} THz", ha = "center", fontsize = 12)
@@ -145,8 +147,10 @@ class Signal():
         fourier = list(self.E_f_abs)
         freq = list(self.freq)
         broadband = self.bandwidth
+        name = self.name
     
         json_dict = {
+            "name": name,
             "signal":signal,
             "fourier":fourier,
             "freq": freq,
