@@ -58,9 +58,9 @@ class Simulation:
                 percent += print_percent
                 print(f"Simulation {self.name}\n{percent} % completed")
                 current_time = perf_counter()
-                print(f"Total simulation time: {current_time - first_time} s\n----------")
+                print(f"Total simulation time: {current_time - first_time:.0f} s\n----------")
         current_time = perf_counter()
-        print(f"Simulation {self.name} completed in {current_time-first_time} s\n----------")
+        print(f"Simulation {self.name} completed in {current_time-first_time:.0f} s\n----------")
 
     def step(self, t_i, max_shift):
         dt = self.sim_p["dt"]
@@ -278,19 +278,19 @@ class E_field:
         return all_delta_t, delta_t_max
 
 if __name__ == "__main__":
+    pass
     
-    from oneparamtest import sim_params, medium_params, vacuum_params, spin_flux
-    from freq_analysis.broadband import Signal
-    signal_params = {"padfactor":9, "n_interpol":1, "dt":1, "bb_fraction": 10}
+    # from freq_analysis.broadband import Signal
+    # signal_params = {"padfactor":9, "n_interpol":1, "dt":1, "bb_fraction": 10}
 
-    sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
-    sim_signals = {}
+    # sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params)
+    # sim_signals = {}
 
-    sim.run(disp_progress=True)
-    for E_i, E in enumerate(sim.vacuum.E_fields):
-        key = str(E.z)
-        sim_signals[key] = Signal(E.Ex, signal_params)
-    for z in sim_signals:
-        print(sim_signals[z].bandwidth)
-        sim_signals[z].plot_bb("nice_bb")
+    # sim.run(disp_progress=True)
+    # for E_i, E in enumerate(sim.vacuum.E_fields):
+    #     key = str(E.z)
+    #     sim_signals[key] = Signal(E.Ex, signal_params)
+    # for z in sim_signals:
+    #     print(sim_signals[z].bandwidth)
+    #     sim_signals[z].plot_bb("nice_bb")
     
