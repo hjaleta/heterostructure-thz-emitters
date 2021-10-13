@@ -30,9 +30,9 @@ class Simulation:
     def get_mediums(self):
         mediums = []
         for medium in self.med_p:
-            print(medium)
+            # print(medium)
             z_0, z_end = medium["z"]
-            print(z_0,z_end)
+            # print(z_0,z_end)
             medium_spin_flux = self.spin_flux[:,z_0:z_end]
             mediums.append(Medium(medium, self.sim_p, medium_spin_flux))
         return mediums

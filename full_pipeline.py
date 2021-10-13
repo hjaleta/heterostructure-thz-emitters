@@ -1,13 +1,14 @@
 from E_fieldSimulation.simulation import Simulation
 from freq_analysis.broadband import Signal
 from pipeline_tools.check_data import check_folders, check_flux
-from pipeline_tools.build_simulation_input import build_input_params_py, build_simulation_setup
+from pipeline_tools.build_simulation_input import build_simulation_setup, build_param_json, decode_json_params
 import os
 import sys
 
 spin_source_folder = "test_pipeline/Spin Currents"
 sim_folder = "test_pipeline/Simulation Results"
 params_py_path = "E_fieldSimulation/input_params.py"
+json_source_path = "E_fieldSimulation/input_params.json"
 
 check_source_folders = True
 build_sim_params = True
@@ -24,18 +25,16 @@ if check_source_folders:
         print(f"All {len(complete)} folders have a valid flux.out file")
 
 if build_sim_params:
-    build_simulation_setup(spin_source_folder, sim_folder, params_py_path)
+    build_simulation_setup(spin_source_folder, sim_folder, json_source_path, num_layers=2)
 
 if run_simulation:
     N_simulations = len(os.listdir(sim_folder))
     for folder in os.listdir(sim_folder):
         source_folderpath = "/".join( [spin_source_folder, folder])
         result_folderpath = "/".join( [sim_folder, folder])
-        sys.path.append(source_folderpath)
-        from input_params import sim_params, medium_params, vacuum_params, spin_flux
-        # print(spin_flux.shape)
-        sys.path.remove(source_folderpath)
-        spin_flux = spin_flux[:600,:]
+        param_path = "/".join([source_folderpath, "input_params.json"])
+       
+        sim_params, medium_params, vacuum_params, spin_flux = decode_json_params(param_path, sim_time)
         # print(spin_flux)
         sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params, name = folder)
         print(medium_params)
