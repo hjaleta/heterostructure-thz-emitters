@@ -2,6 +2,16 @@ import numpy as np
 from math import sqrt
 
 def get_J(t_i_ret, time_series):
+    """Calculates the current J by interpolation
+
+    Args:
+        t_i_ret (float): The retarded time for which J is calculated
+        time_series: A series of data points for J
+
+    Returns:
+        0 if the retarded time is < 0 (causality)
+        J [float]: The interpolated value of J
+    """
     if t_i_ret <= 0 :
         return 0
     else:
