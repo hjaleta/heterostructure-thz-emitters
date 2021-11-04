@@ -84,7 +84,9 @@ class Simulation:
 
     def get_mediums(self):
         mediums = []
-        for medium in self.med_p: # Loop over mediums
+        
+        # Loop over mediums
+        for medium in self.med_p: 
             z_0, z_end = medium["z"] # Get medium z-coordinates
             medium_spin_flux = self.spin_flux[:,z_0:z_end] # Extract the spin flux using the coordinates
             mediums.append(Medium(medium, self.sim_p, medium_spin_flux)) # Create Medium
@@ -260,24 +262,26 @@ class Medium:
                 l1.append(l2)
 
         elif exc_region["shape"] == "circle": # This code block calculates a circular excitation region
-            r_squared = exc_region["radius"]**2         
+            r_squared = exc_region["radius"]**2  # Radius squared
             l1 = []
             for x_i in X:
                 l2 = []
                 for y_i in Y:
-                    if x_i**2 + y_i**2 < r_squared:
+                    if x_i**2 + y_i**2 < r_squared: #Check if point is within circle
+
                         l2.append(1)
                     else:
                         l2.append(0)
                 l1.append(l2)
         else:
             raise ValueError("Invalid shape of excitation region, use 'circle' or 'square'")
-        region = np.array([l1]*Nz)
-        region = np.moveaxis(region, 0, 2)
+        region = np.array([l1]*Nz) # Add z-dimension and create array
+        region = np.moveaxis(region, 0, 2) # Fix compatibility of dimension 
         # print(region.shape)
         return region
 
     def get_usage(self):
+        # This function checks if the Medium contributes to the E-field
         for coord in ["x", "y", "z"]:
             if self.params[f"use_J{coord}"]:
                 return True
@@ -328,12 +332,13 @@ class Vacuum:
     def get_E_fields(self, sim_params, mediums, N_time, interfaces):
         E_fields = []
         
-        for z in self.z:
-            E = E_field(z, sim_params, mediums, N_time, interfaces)
+        for z in self.z: # Iterate over the distances we want to calculate the E-field in
+            E = E_field(z, sim_params, mediums, N_time, interfaces) # Create E_field
             E_fields.append(E)
         return E_fields
 
     def get_max_delta_t(self):
+        # This function finds the biggest time retardation for the system
         maxes =[]
         for E in self.E_fields:
             maxes.append(E.delta_t_max)
@@ -405,59 +410,76 @@ class E_field:
         self.delta_t, self.delta_t_max = self.get_delta_t(mediums)
 
     def get_delta_r(self, sim_params, mediums, interfaces):
+        # List of array or NoneType correspondning to each medium. If array, it contains source vectors 
+        # for the E_field. The source vectors consist of multiple numbers, each corresponding to 
+        # the distance in respective Medium / Vacuum
         all_delta_r = []
-        for m_i, medium in enumerate(mediums):
-            if medium.use:
+        for m_i, medium in enumerate(mediums): # Iterate over Mediums
+            if medium.use: # If the Medium contributes to the E_field
+
+                # Get spatial properties of Medium
                 x_min, x_max = medium.params["x"]
                 y_min, y_max = medium.params["y"]
                 z_min, z_max = medium.params["z"]
-                #delta_t = np.zeros(medium.N_points)
                 Nx, Ny, Nz = medium.N_points
-                delta_r = np.zeros((Nx,Ny,Nz, len(mediums)+1))
                 dx, dy, dz =  sim_params["dx"], sim_params["dy"], sim_params["dz"]
-                for (x_i,y_i,z_i), val in np.ndenumerate(delta_r[:,:,:,0]):
+
+                # Allocate space for source vectors
+                delta_r = np.zeros((Nx,Ny,Nz, len(mediums)+1))
+
+                for (x_i,y_i,z_i), val in np.ndenumerate(delta_r[:,:,:,0]): # Iterate over all cells in Medium
+
+                    # Calculate source vector coordinates
                     x_s = x_min + x_i * dx
                     y_s = y_min + y_i * dy
                     z_s = z_min + z_i * dz
+
+                    # Calculate distances in source vector. 
+                    # Every distance corresponds to one Medium or Vacuum
                     r = get_r_tuple(x_s, y_s, z_s, self.z, interfaces)
+
+                    # Put source vector into array
                     delta_r[x_i,y_i,z_i,:] = r
                 all_delta_r.append(delta_r)
-            else:
+            else: # If no contribution from Medium, just append None
                 all_delta_r.append(None)
         return all_delta_r
 
     def get_delta_r_tot(self):
+        # Calculate the total distance of the source vectors
         all_delta_r_tot = []
-        for delta_r in self.delta_r:
+        for delta_r in self.delta_r: # Iterate over Mediums
             if delta_r is None:
                 all_delta_r_tot.append(None)
             else:
+                # Allocate space for array
                 r_array = np.zeros(delta_r[:,:,:,0].shape)
+                # Iterae over source vectors
                 for (xi,yi,zi), _ in np.ndenumerate(delta_r[:,:,:,0]):
-                    r_tot = np.sum(delta_r[xi,yi,zi,:])
+                    r_tot = np.sum(delta_r[xi,yi,zi,:]) # Sum contributions to total source vector
                     r_array[xi,yi,zi] = r_tot
                 all_delta_r_tot.append(r_array)
         return all_delta_r_tot
 
     def get_delta_t(self, mediums):
         n = []
-        for medium in mediums:
+        for medium in mediums: # Fetch refravctive indices
             n.append(medium.params["n"])
-        n.append(1)
+        n.append(1) # Append the Vacuum refractive index
         all_delta_t = []
         delta_t_maxes = []
-        for arr in self.delta_r:
-            if arr is None:
+        for arr in self.delta_r: # Iterate over source vectors
+            if arr is None: # If no contribution
                 all_delta_t.append(None)
             else:
-                Nx,Ny,Nz,Nm = arr.shape
-                delta_t = np.zeros((Nx,Ny,Nz))
-                for (x_i, y_i, z_i), _ in np.ndenumerate(delta_t):
-                    tup = arr[x_i,y_i,z_i,:].copy()
-                    t = calc_delta_t(tup, n)
-                    delta_t[x_i,y_i,z_i] = t
-                t_min = np.amin(delta_t)
-                delta_t -= np.ones(delta_t.shape)*t_min
+                Nx,Ny,Nz,Nm = arr.shape 
+                delta_t = np.zeros((Nx,Ny,Nz)) # Allocate space for time delays
+                for (x_i, y_i, z_i), _ in np.ndenumerate(delta_t): # Iterate over source vectors
+                    tup = arr[x_i,y_i,z_i,:].copy() # Fetch source vector
+                    t = calc_delta_t(tup, n) # Calculate time retardation
+                    delta_t[x_i,y_i,z_i] = t # Put time retardation into array
+                t_min = np.amin(delta_t) # Calculate the smallest time delay
+                delta_t -= np.ones(delta_t.shape)*t_min # Shift time delays so that the smallest time delay is zero
                 all_delta_t.append(delta_t)
                 delta_t_maxes.append(np.amax(delta_t))
         delta_t_max = max(delta_t_maxes)
