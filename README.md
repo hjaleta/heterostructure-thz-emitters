@@ -1,4 +1,14 @@
-# spin_project
-# A python extension to the Fortran code by Pavel
-# Calculates the E - field given a spin current density
-# 
+This repository contains several modules. For more details, see the documentation for respective module in the corresponding folder.
+
+Input_to_spin_simulation:
+    This module's purpose is to simplify the execution of Pavel Balaz's Superdiffusive Spin Transport script in Fortran. 
+
+EfieldSimulation:
+    This module aims to represent the simulated system. It takes the output from the Fortran code as its input, and outputs E-fields.
+
+Frequency:
+    This module contains script that analyze the frequenzy properties of the simulated E-field.
+
+PipelineTools:
+    This module contains pipeline functions that helps perform the entire Python simulation, from spin current to final results
+     

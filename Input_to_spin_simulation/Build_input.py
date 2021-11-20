@@ -1,20 +1,32 @@
+""" 
+This script contains functions that together generate a folder with 
+multiple subfolders in it. Each subfolder contains the four input files 
+that are required to run one instance of the Fortran code. 
+"""
+
 import os
 import shutil
 
 def build_inputdat(source_path, new_path, params):
+
+    # This function generates the  input.dat files to the subfolder
+    # source_path is a path to the template file, i.e. an input.dat file 
+    # new_path is the path where the new file should be saved
+    # params is the parameters that we change from the original file
+    # In this version it is: [[material strings], [material widths], length of laser pulse, closed]
+
+    # Extract lines from the template file
     old_file = open(source_path, "r")
     lines = old_file.read().split("\n")
     old_file.close()
+
+    # Extract valuses from params
     materials, widths, laser, closed = params
-    
     if (len(materials) != len(widths)):
         raise ValueError("Materials and widths not matching")
-        
     material_string = " ".join(materials)
     z_max = f"{int(sum(widths))}."
     N_regions = str(len(materials))
-    # print(materials)
-    # print(N_regions)
     laser  = f"{laser}."
     interfaces = []
     z = 0
@@ -22,22 +34,32 @@ def build_inputdat(source_path, new_path, params):
         z += w
         interfaces.append(str(z))
     interfaces = ". ".join(interfaces) + "."
-    
+
+    # Replace lines from template with new params
     lines[12] = z_max
     lines[26] = N_regions
     lines[28] = interfaces
     lines[30] = material_string
     lines[38] = laser
     
+    # Compile and save the new lines into a new input.dat file
     new_file_string = "\n".join(lines)
     new_file = open(new_path,"w")
     new_file.write(new_file_string)
     new_file.close()
 
 def build_submitsh(source_path, new_path, params):
+    # This function generates the  submit.sh file to the subfolder
+    # source_path is a path to the template file, i.e. an submit.sh file 
+    # new_path is the path where the new file should be saved
+    # params is the parameters that we change from the original file
+
+    # Extract lines from the template file
     old_file = open(source_path, "r")
     lines = old_file.read().split("\n")
     old_file.close()
+
+    # Extract valuses from params
     materials, widths, laser, closed = params
     m = "".join(materials)
     w = "-".join([str(w) for w in widths])
@@ -47,15 +69,21 @@ def build_submitsh(source_path, new_path, params):
     else:
         c = "open"
     description = f"W{w}-L{l}"
+
+    # Replace lines from template with new params
     lines[1] += description
     
+    # Compile and save the new lines into a new input.dat file
     new_file_string = "\n".join(lines)
     new_file = open(new_path,"w")
     new_file.write(new_file_string)
     new_file.close()
 
 def generate_params(materials, widths, lasers, closed):
-    """Generates a list of param tuples that define material, widths and laser"""
+    """
+    Generates a list of param tuples that define material, widths and laser
+    These param tuples are the input to functions build_input_dat and build_submitsh
+    """
     param_list = []
     
     
@@ -80,6 +108,7 @@ def generate_params(materials, widths, lasers, closed):
     return param_list
 
 def params_to_path(parent_path, params):
+    # Generate the name of the subfolder based on the folders
     materials, widths, laser, closed = params
     m = "".join(materials)
     w = "-".join([str(w) for w in widths])
