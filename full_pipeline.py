@@ -1,11 +1,8 @@
-from E_fieldSimulation.simulation import Simulation
-from freq_analysis.broadband import Signal
-from pipeline_tools.check_data import check_folders, check_flux
-from pipeline_tools.build_simulation_input import build_simulation_setup, build_param_json, decode_json_params
+from EfieldSimulation.Simulation import Simulation
+from Frequency.Broadband import Signal
+from PipelineTools.check_data import check_folders, check_flux
+from PipelineTools.build_simulation_input import build_simulation_setup, build_param_json, decode_json_params
 import os
-
-# spin_source_folder = "test_pipeline/Spin Currents"
-# sim_folder = "test_pipeline/Simulation Results"
 
 spin_source_folder = "Full Simulation/Spin Current Data/FuPt-closed"
 sim_folder = "Full Simulation/Simulation Results/FuPt-closed"

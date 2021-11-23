@@ -13,8 +13,6 @@ def build_param_json(source_path, target_path, z, spin_flux_path):
     for p_i, pair in enumerate(z):
         params["medium_params"][p_i]["z"] = z[p_i]
     params["spin_flux_path"] = spin_flux_path
-    # with open(target_path, "w") as json_param_file:
-    #     json.dump(params, json_param_file)
     j_object = json.dumps(params, indent=4)
     with open (target_path, "w") as json_param_file:
         json_param_file.write(j_object)
