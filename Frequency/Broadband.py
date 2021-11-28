@@ -107,7 +107,7 @@ class Signal():
         ax.plot(self.t_org, self.E_org)
         ax.set_xlabel("Time [fs]")
         ax.set_ylabel("E-field [N/C]")
-        ax.set_title("Transient Signal - {self.name}")
+        ax.set_title(f"Transient Signal - {self.name}")
 
         if figpath != "None":
             if figpath[-4:] != ".png":
@@ -132,7 +132,7 @@ class Signal():
         ax.plot(self.freq[plot_min:plot_max], self.E_f_abs[plot_min:plot_max])
         ax.set_xlabel("Frequency [THz]")
         ax.set_ylabel("E-field [N/C]")
-        ax.set_title("Frequency Spectra - {self.name}")
+        ax.set_title(f"Frequency Spectra - {self.name}")
         text_x = (self.freq[i_min] * 2 + self.freq[i_max]) / 3
         text_y = np.amax(self.E_f_abs)/3
         ax.text(text_x, text_y, f"Bandwidth: {self.bandwidth:.2f} THz", ha = "center", fontsize = 12)
