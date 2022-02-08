@@ -1,1 +1,0 @@
-This folder holds the results from the Fortran simulations
