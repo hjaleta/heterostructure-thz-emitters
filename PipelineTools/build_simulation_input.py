@@ -1,9 +1,14 @@
+""" 
+This module constructs the proper json-files needed for the simulation of the electric field
+"""
+
 import os
 import re
 import json
 import numpy as np
 
 def build_param_json(source_path, target_path, z, spin_flux_path):
+    print(source_path)
     with open(source_path, "r") as source_params:
         params = json.load(source_params)
     if len(z) != len(params["medium_params"]):
@@ -41,8 +46,5 @@ def build_simulation_setup(parent_dir, new_parent_dir, json_source_path, num_lay
             z_min = t
         json_target_path = "/".join([folder_dir, "input_params.json"])
         new_folder_dir = "/".join([new_parent_dir, folder])
-        try:
-            os.mkdir(new_folder_dir)
-        except:
-            pass
+        os.makedirs(new_folder_dir, exist_ok=True)
         build_param_json(json_source_path, json_target_path, medium_z_range, spin_flux_path)

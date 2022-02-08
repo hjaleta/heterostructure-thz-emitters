@@ -1,10 +1,21 @@
-This repository contains several modules. For more details, see the documentation for respective module in the corresponding folder.
+# TeraHertz radiation from laser pumped heterostructures
 
-Input_to_spin_simulation:
-    This module's purpose is to simplify the execution of Pavel Balaz's Superdiffusive Spin Transport script in Fortran. 
+This repository's purpose is to model and simulate laser pumped heterostructures. For detailed description of the modelling, 
+please check the EFiieldSimulation.Simulation module, or the associated report.
+
+### Packages
+
+##### Fortran Simulation
+
+The 
+
+##### EFieldSimulation
+Represent the simulated system. It takes the output from the Fortran code as its input, and outputs E-fields.
+
+This module's purpose is to simplify the execution of Pavel Balaz's Superdiffusive Spin Transport script in Fortran. 
 
 EfieldSimulation:
-    This module aims to represent the simulated system. It takes the output from the Fortran code as its input, and outputs E-fields.
+    
 
 Frequency:
     This module contains script that analyze the frequenzy properties of the simulated E-field.
