@@ -1,3 +1,9 @@
+"""
+This model computes the best linear regression fit to the results
+The purpose is to investigate the correlation between the features (widths and laser pulse)
+
+"""
+
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
@@ -17,12 +23,13 @@ def fitResults(df, include_crossterms=False):
     scaler = preprocessing.StandardScaler().fit(X)
     X_scaled = scaler.transform(X)
     linear_model = LinearRegression().fit(X_scaled, Y)
-
-    return linear_model.coef_, linear_model.intercept_
+    coeff_dict = {feature:coef for feature, coef in zip(list(df.columns)[1:], list(linear_model.coef_)[0]) }
+    coeff_dict["Intercept"] = float(linear_model.intercept_)
+    return coeff_dict
 
 if __name__ == "__main__":
     from AnalyseResults.ResultToDF import getDF
     result_dir = "Full Simulation/Simulation Results/FuPt-closed/"
     df = getDF(result_dir)
-    coeffs, intercept = fitResults(df, False)
-    print(intercept, coeffs)
+    coeff_dict = fitResults(df, False)
+    print(coeff_dict)

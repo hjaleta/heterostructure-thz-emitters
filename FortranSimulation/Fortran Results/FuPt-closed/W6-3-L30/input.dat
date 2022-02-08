@@ -1,0 +1,70 @@
+Ver 3.1.0
+DO NOT CHANGE THE FORMAT, do not enter blank lines, always make it consistent
+USE THIS FILE AS STANDARD INPUT (Ex: qbd1D.exe < input.dat )
+-> Verbosity (verbosity) [0=low,1=high,2=diagnostic]
+1
+-> Smearing of Step Function (k should be high 500. is a good value) [Real number: put a point!]
+500.
+-> Smoothing of solution (should be =0.) [Real number: put a point!]
+0.
+-> Z min in nm (zmin) [Real number: put a point!]
+0.
+-> Z max in nm (zmax) [Real number: put a point!]
+9.
+-> t min in fs (tmin) [Real number: put a point!]
+0.
+-> t max in fs (tmax) [Real number: put a point!]
+1000.
+-> Spatial Discretization Step in nm (dz) [Real number: put a point!]
+1.0
+-> Temporal Discretization Step in fs (dt) [Real number: put a point!]
+1.0
+-> (rtbound) in fs. This is the most distant past that we take into account
+100
+-> Energy Discretization Step in eV (dE) [Real number: put a point!]
+0.125
+-> Number of different regions 
+2
+-> Places of interfaces (nm) [Real number: put a point!]
+6.
+-> Materials in different regions (2 letters per material separated by a space)
+Fu Pt
+-> Name of the file with the Properties of the Material (filmaterialprop)
+materialsdata_up_down.dat reflect_ssv1.dat
+-> Type of input for the External Source (extsourcetype) [delta,general,test,expgauss]
+expgauss
+-> Source data
+EXPGAUSS TYPE EXTERNAL SOURCE
+-> Time length of pulse (at half width) [Real number: put a point!]
+30.
+-> Time position of peak [Real number: put a point!]
+200.
+-> Lambda coefficients in different regions [Real numbers: put a point!]
+15.0 15.0
+-> Average number of excited electrons [spin,energy,region] (WARNING: Energy channels should be consistent with Material Properties!)
+Spin down
+3.126 6.932
+2.617 5.617
+2.514 4.164
+2.686 2.880
+3.164 1.901
+4.089 1.354
+5.518 1.165
+7.251 1.122
+9.059 1.112
+11.007 1.107
+13.112 1.102
+14.797 1.098
+Spin up
+6.704 6.932
+4.980 5.617
+3.294 4.164
+2.225 2.880
+1.784 1.901
+1.665 1.354
+1.630 1.165
+1.605 1.122
+1.583 1.112
+1.560 1.107
+1.537 1.102
+1.516 1.098

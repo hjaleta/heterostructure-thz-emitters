@@ -1,3 +1,7 @@
+"""
+This file's function converts the result files to a DataFrame
+"""
+
 import json
 import os
 import sys
@@ -7,9 +11,24 @@ import pandas as pd
 import re
 
 def getDF(result_parent_dir, sort_df = False):
+    """
+    Recursively takes all files from a directory (top to bottom), finds all 
+    json result files and extract the 2 widths, the length of the laser pulse and the broadband
+    from each file
+    Args:
+        result_parent_dir: str
+            The directory where we save the results
+        
+        sort_df: bool
+            Determines whether the df should be sorted after broadband
+
+    Returns:
+        df: pandas.DataFrame
+            The DataFrame with the results
+        
+    """
     cwd = os.getcwd()
     all_results_path = cwd + "/" + result_parent_dir
-
     data_dict = {"Signal Bandwidth [THz]": [], "Width Iron [nm]":[], "Width Platinum [nm]":[], "Laser Pulse Time [fs]": []}
 
     num_pattern = r"W(\d)-(\d)-L(\d*)"
@@ -36,11 +55,8 @@ def getDF(result_parent_dir, sort_df = False):
     return df
 
 def export_df(df, path):
+    """Save the DataFrame at the speciifed path"""
     df.to_csv(path, float_format= '%.1f')
 
 if __name__ == "__main__":
-    # result_parent_dir = "Full Simulation/Simulation Results/FuPt-closed/" 
-    # export_dir = "/home/hjaleta/spin_project/AnalyseResults/Sorted Table of Bandwidths2.csv"
-    # df = getDF(result_parent_dir,True)
-    # export_df(df, export_dir)
     pass

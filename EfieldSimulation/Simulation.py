@@ -1,3 +1,7 @@
+"""
+This module contains the classes we use in the simulation of the heterostructure
+"""
+
 import numpy as np
 from time import perf_counter
 from math import ceil
@@ -9,7 +13,7 @@ class Simulation:
     """
         This class contains the entire system. It stores the Mediums, Vacuum, and Efield. It utilizes Jefimenko's equations to model
         the heterostructure and calculate the E-field.
-        ...
+        
         ----------
         Attributes
         ----------

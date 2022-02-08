@@ -1,0 +1,1245 @@
+ **** SUBROUTINE readinputgeneral
+ 
+ verbosity        =            1
+ poszmin          =   0.0000000E+00
+ poszmax          =    6.000000    
+ postmin          =   0.0000000E+00
+ postmax          =    600.0000    
+ dz               =    1.000000    
+ dt               =    1.000000    
+ zmin             =            1
+ zmax             =            6
+ tmin             =            1
+ tmax             =          601
+ filematerialprop = materialsdata_up_down.dat     
+ filereflective = reflect_ssv1.dat              
+ extsourcetype    = expgauss  
+ 
+ **** END SUBROUTINE readinputgeneral
+ 
+ 
+ **** SUBROUTINE readmaterialprop
+ 
+ Emin =            1
+ Emax =           12
+ **** END SUBROUTINE readmaterialprop
+ 
+ 
+ **** SUBROUTINE readextsource
+ 
+ Computing expgauss
+ **** END SUBROUTINE readextsource
+ 
+ 
+                         Time iteration      Real time
+It is running-->Time           2             1.000000 fs
+  7.740020751953125E-003
+It is running-->Time           3             2.000000 fs
+  2.073049545288086E-003
+It is running-->Time           4             3.000000 fs
+  2.185106277465820E-003
+It is running-->Time           5             4.000000 fs
+  2.098083496093750E-003
+It is running-->Time           6             5.000000 fs
+  1.833915710449219E-003
+It is running-->Time           7             6.000000 fs
+  1.967906951904297E-003
+It is running-->Time           8             7.000000 fs
+  2.238988876342773E-003
+It is running-->Time           9             8.000000 fs
+  2.469062805175781E-003
+It is running-->Time          10             9.000000 fs
+  2.544879913330078E-003
+It is running-->Time          11            10.000000 fs
+  2.765893936157227E-003
+It is running-->Time          12            11.000000 fs
+  3.159999847412109E-003
+It is running-->Time          13            12.000000 fs
+  3.650903701782227E-003
+It is running-->Time          14            13.000000 fs
+  4.507064819335938E-003
+It is running-->Time          15            14.000000 fs
+  4.774093627929688E-003
+It is running-->Time          16            15.000000 fs
+  5.511999130249023E-003
+It is running-->Time          17            16.000000 fs
+  6.350994110107422E-003
+It is running-->Time          18            17.000000 fs
+  6.924867630004883E-003
+It is running-->Time          19            18.000000 fs
+  7.735013961791992E-003
+It is running-->Time          20            19.000000 fs
+  8.938074111938477E-003
+It is running-->Time          21            20.000000 fs
+  1.021599769592285E-002
+It is running-->Time          22            21.000000 fs
+  1.167583465576172E-002
+It is running-->Time          23            22.000000 fs
+  1.333594322204590E-002
+It is running-->Time          24            23.000000 fs
+  3.946495056152344E-002
+It is running-->Time          25            24.000000 fs
+  2.037000656127930E-002
+It is running-->Time          26            25.000000 fs
+  1.982998847961426E-002
+It is running-->Time          27            26.000000 fs
+  2.249717712402344E-002
+It is running-->Time          28            27.000000 fs
+  2.548623085021973E-002
+It is running-->Time          29            28.000000 fs
+  2.866005897521973E-002
+It is running-->Time          30            29.000000 fs
+  3.274798393249512E-002
+It is running-->Time          31            30.000000 fs
+  3.674983978271484E-002
+It is running-->Time          32            31.000000 fs
+  4.123711585998535E-002
+It is running-->Time          33            32.000000 fs
+  4.589796066284180E-002
+It is running-->Time          34            33.000000 fs
+  5.146694183349609E-002
+It is running-->Time          35            34.000000 fs
+  5.662608146667480E-002
+It is running-->Time          36            35.000000 fs
+  6.218314170837402E-002
+It is running-->Time          37            36.000000 fs
+  6.909084320068359E-002
+It is running-->Time          38            37.000000 fs
+  0.109223127365112     
+It is running-->Time          39            38.000000 fs
+  9.020900726318359E-002
+It is running-->Time          40            39.000000 fs
+  9.694099426269531E-002
+It is running-->Time          41            40.000000 fs
+  0.108520984649658     
+It is running-->Time          42            41.000000 fs
+  0.120544910430908     
+It is running-->Time          43            42.000000 fs
+  0.135020017623901     
+It is running-->Time          44            43.000000 fs
+  0.272012948989868     
+It is running-->Time          45            44.000000 fs
+  0.251437187194824     
+It is running-->Time          46            45.000000 fs
+  0.186389923095703     
+It is running-->Time          47            46.000000 fs
+  0.207852840423584     
+It is running-->Time          48            47.000000 fs
+  0.416527986526489     
+It is running-->Time          49            48.000000 fs
+  0.738537073135376     
+It is running-->Time          50            49.000000 fs
+  0.364629983901978     
+It is running-->Time          51            50.000000 fs
+  0.319221019744873     
+It is running-->Time          52            51.000000 fs
+  0.576593875885010     
+It is running-->Time          53            52.000000 fs
+  0.500189065933228     
+It is running-->Time          54            53.000000 fs
+   1.12368607521057     
+It is running-->Time          55            54.000000 fs
+  0.496319055557251     
+It is running-->Time          56            55.000000 fs
+  0.545995950698853     
+It is running-->Time          57            56.000000 fs
+  0.626308917999268     
+It is running-->Time          58            57.000000 fs
+  0.676975011825562     
+It is running-->Time          59            58.000000 fs
+  0.831958055496216     
+It is running-->Time          60            59.000000 fs
+  0.876496076583862     
+It is running-->Time          61            60.000000 fs
+  0.986728191375732     
+It is running-->Time          62            61.000000 fs
+   1.05893206596375     
+It is running-->Time          63            62.000000 fs
+   1.21577501296997     
+It is running-->Time          64            63.000000 fs
+   1.31952714920044     
+It is running-->Time          65            64.000000 fs
+   1.49579095840454     
+It is running-->Time          66            65.000000 fs
+   1.67286300659180     
+It is running-->Time          67            66.000000 fs
+   1.93054795265198     
+It is running-->Time          68            67.000000 fs
+   2.03876090049744     
+It is running-->Time          69            68.000000 fs
+   2.30422496795654     
+It is running-->Time          70            69.000000 fs
+   2.53913497924805     
+It is running-->Time          71            70.000000 fs
+   2.94372415542603     
+It is running-->Time          72            71.000000 fs
+   3.09113717079163     
+It is running-->Time          73            72.000000 fs
+   3.46167492866516     
+It is running-->Time          74            73.000000 fs
+   3.85669088363647     
+It is running-->Time          75            74.000000 fs
+   4.44120621681213     
+It is running-->Time          76            75.000000 fs
+   4.81403708457947     
+It is running-->Time          77            76.000000 fs
+   6.11237692832947     
+It is running-->Time          78            77.000000 fs
+   6.32762312889099     
+It is running-->Time          79            78.000000 fs
+   6.92518591880798     
+It is running-->Time          80            79.000000 fs
+   7.53063511848450     
+It is running-->Time          81            80.000000 fs
+   8.44192695617676     
+It is running-->Time          82            81.000000 fs
+   9.37915301322937     
+It is running-->Time          83            82.000000 fs
+   10.1553418636322     
+It is running-->Time          84            83.000000 fs
+   11.1947441101074     
+It is running-->Time          85            84.000000 fs
+   12.4339630603790     
+It is running-->Time          86            85.000000 fs
+   13.8843529224396     
+It is running-->Time          87            86.000000 fs
+   15.3225979804993     
+It is running-->Time          88            87.000000 fs
+   17.4968290328979     
+It is running-->Time          89            88.000000 fs
+   19.7717969417572     
+It is running-->Time          90            89.000000 fs
+   21.7629511356354     
+It is running-->Time          91            90.000000 fs
+   23.9576079845428     
+It is running-->Time          92            91.000000 fs
+   26.0354077816010     
+It is running-->Time          93            92.000000 fs
+   29.1319999694824     
+It is running-->Time          94            93.000000 fs
+   34.5554900169373     
+It is running-->Time          95            94.000000 fs
+   36.1399018764496     
+It is running-->Time          96            95.000000 fs
+   40.2127900123596     
+It is running-->Time          97            96.000000 fs
+   45.7714309692383     
+It is running-->Time          98            97.000000 fs
+   51.4175021648407     
+It is running-->Time          99            98.000000 fs
+   57.4208929538727     
+It is running-->Time         100            99.000000 fs
+   62.2200319766998     
+It is running-->Time         101           100.000000 fs
+   69.3684539794922     
+It is running-->Time         102           101.000000 fs
+   77.3977191448212     
+It is running-->Time         103           102.000000 fs
+   100.403117179871     
+It is running-->Time         104           103.000000 fs
+   114.026849985123     
+It is running-->Time         105           104.000000 fs
+   110.868211984634     
+It is running-->Time         106           105.000000 fs
+   111.053066968918     
+It is running-->Time         107           106.000000 fs
+   94.9639141559601     
+It is running-->Time         108           107.000000 fs
+   86.6387460231781     
+It is running-->Time         109           108.000000 fs
+   105.490976095200     
+It is running-->Time         110           109.000000 fs
+   114.485345840454     
+It is running-->Time         111           110.000000 fs
+   113.426305055618     
+It is running-->Time         112           111.000000 fs
+   113.591591835022     
+It is running-->Time         113           112.000000 fs
+   102.349956035614     
+It is running-->Time         114           113.000000 fs
+   113.358500003815     
+It is running-->Time         115           114.000000 fs
+   113.020428180695     
+It is running-->Time         116           115.000000 fs
+   111.555841207504     
+It is running-->Time         117           116.000000 fs
+   101.016900062561     
+It is running-->Time         118           117.000000 fs
+   85.7711169719696     
+It is running-->Time         119           118.000000 fs
+   85.3273990154266     
+It is running-->Time         120           119.000000 fs
+   86.0696978569031     
+It is running-->Time         121           120.000000 fs
+   85.4304637908936     
+It is running-->Time         122           121.000000 fs
+   85.6709921360016     
+It is running-->Time         123           122.000000 fs
+   86.8503029346466     
+It is running-->Time         124           123.000000 fs
+   86.2232491970062     
+It is running-->Time         125           124.000000 fs
+   86.2258400917053     
+It is running-->Time         126           125.000000 fs
+   86.5104122161865     
+It is running-->Time         127           126.000000 fs
+   86.7980968952179     
+It is running-->Time         128           127.000000 fs
+   86.3275508880615     
+It is running-->Time         129           128.000000 fs
+   86.6798269748688     
+It is running-->Time         130           129.000000 fs
+   85.7940468788147     
+It is running-->Time         131           130.000000 fs
+   85.6256139278412     
+It is running-->Time         132           131.000000 fs
+   86.0511300563812     
+It is running-->Time         133           132.000000 fs
+   87.3681409358978     
+It is running-->Time         134           133.000000 fs
+   87.1489338874817     
+It is running-->Time         135           134.000000 fs
+   85.5697720050812     
+It is running-->Time         136           135.000000 fs
+   85.2253720760345     
+It is running-->Time         137           136.000000 fs
+   86.9400801658630     
+It is running-->Time         138           137.000000 fs
+   85.5029370784760     
+It is running-->Time         139           138.000000 fs
+   85.9908678531647     
+It is running-->Time         140           139.000000 fs
+   87.0542359352112     
+It is running-->Time         141           140.000000 fs
+   85.6965789794922     
+It is running-->Time         142           141.000000 fs
+   87.5244648456573     
+It is running-->Time         143           142.000000 fs
+   86.4699230194092     
+It is running-->Time         144           143.000000 fs
+   86.9875009059906     
+It is running-->Time         145           144.000000 fs
+   87.3032288551331     
+It is running-->Time         146           145.000000 fs
+   85.5213909149170     
+It is running-->Time         147           146.000000 fs
+   85.5090079307556     
+It is running-->Time         148           147.000000 fs
+   86.8947660923004     
+It is running-->Time         149           148.000000 fs
+   86.7910189628601     
+It is running-->Time         150           149.000000 fs
+   86.7362079620361     
+It is running-->Time         151           150.000000 fs
+   85.9234321117401     
+It is running-->Time         152           151.000000 fs
+   86.1725850105286     
+It is running-->Time         153           152.000000 fs
+   86.1874768733978     
+It is running-->Time         154           153.000000 fs
+   87.2340970039368     
+It is running-->Time         155           154.000000 fs
+   87.5193839073181     
+It is running-->Time         156           155.000000 fs
+   86.1610019207001     
+It is running-->Time         157           156.000000 fs
+   86.5151131153107     
+It is running-->Time         158           157.000000 fs
+   85.6705448627472     
+It is running-->Time         159           158.000000 fs
+   85.4348809719086     
+It is running-->Time         160           159.000000 fs
+   86.2287831306458     
+It is running-->Time         161           160.000000 fs
+   86.1979060173035     
+It is running-->Time         162           161.000000 fs
+   86.1162049770355     
+It is running-->Time         163           162.000000 fs
+   86.2930719852448     
+It is running-->Time         164           163.000000 fs
+   86.5753810405731     
+It is running-->Time         165           164.000000 fs
+   86.1942758560181     
+It is running-->Time         166           165.000000 fs
+   86.5233829021454     
+It is running-->Time         167           166.000000 fs
+   86.8506240844727     
+It is running-->Time         168           167.000000 fs
+   86.6759140491486     
+It is running-->Time         169           168.000000 fs
+   86.7832589149475     
+It is running-->Time         170           169.000000 fs
+   86.2518358230591     
+It is running-->Time         171           170.000000 fs
+   86.3319540023804     
+It is running-->Time         172           171.000000 fs
+   85.6262509822845     
+It is running-->Time         173           172.000000 fs
+   86.5590209960938     
+It is running-->Time         174           173.000000 fs
+   97.7726600170135     
+It is running-->Time         175           174.000000 fs
+   97.2248539924622     
+It is running-->Time         176           175.000000 fs
+   97.5732209682465     
+It is running-->Time         177           176.000000 fs
+   95.8676829338074     
+It is running-->Time         178           177.000000 fs
+   90.3755440711975     
+It is running-->Time         179           178.000000 fs
+   87.3175389766693     
+It is running-->Time         180           179.000000 fs
+   104.900049924850     
+It is running-->Time         181           180.000000 fs
+   113.929308891296     
+It is running-->Time         182           181.000000 fs
+   111.202368974686     
+It is running-->Time         183           182.000000 fs
+   112.761946916580     
+It is running-->Time         184           183.000000 fs
+   101.406265020370     
+It is running-->Time         185           184.000000 fs
+   117.147665977478     
+It is running-->Time         186           185.000000 fs
+   112.613610029221     
+It is running-->Time         187           186.000000 fs
+   112.107178926468     
+It is running-->Time         188           187.000000 fs
+   103.281784057617     
+It is running-->Time         189           188.000000 fs
+   95.3830418586731     
+It is running-->Time         190           189.000000 fs
+   107.403426885605     
+It is running-->Time         191           190.000000 fs
+   114.124819040298     
+It is running-->Time         192           191.000000 fs
+   109.660830974579     
+It is running-->Time         193           192.000000 fs
+   111.674751043320     
+It is running-->Time         194           193.000000 fs
+   106.029559135437     
+It is running-->Time         195           194.000000 fs
+   113.490613937378     
+It is running-->Time         196           195.000000 fs
+   109.511139869690     
+It is running-->Time         197           196.000000 fs
+   96.9509968757629     
+It is running-->Time         198           197.000000 fs
+   93.1142749786377     
+It is running-->Time         199           198.000000 fs
+   88.4396359920502     
+It is running-->Time         200           199.000000 fs
+   101.650762081146     
+It is running-->Time         201           200.000000 fs
+   102.727807998657     
+It is running-->Time         202           201.000000 fs
+   104.575134992599     
+It is running-->Time         203           202.000000 fs
+   107.998147964478     
+It is running-->Time         204           203.000000 fs
+   108.473223924637     
+It is running-->Time         205           204.000000 fs
+   109.613909959793     
+It is running-->Time         206           205.000000 fs
+   108.262179851532     
+It is running-->Time         207           206.000000 fs
+   108.545245170593     
+It is running-->Time         208           207.000000 fs
+   107.796802997589     
+It is running-->Time         209           208.000000 fs
+   107.929340839386     
+It is running-->Time         210           209.000000 fs
+   108.147192001343     
+It is running-->Time         211           210.000000 fs
+   107.754492998123     
+It is running-->Time         212           211.000000 fs
+   107.913316011429     
+It is running-->Time         213           212.000000 fs
+   108.824563026428     
+It is running-->Time         214           213.000000 fs
+   108.145689010620     
+It is running-->Time         215           214.000000 fs
+   107.461126089096     
+It is running-->Time         216           215.000000 fs
+   108.724215984344     
+It is running-->Time         217           216.000000 fs
+   108.927114009857     
+It is running-->Time         218           217.000000 fs
+   107.197757005692     
+It is running-->Time         219           218.000000 fs
+   105.789073944092     
+It is running-->Time         220           219.000000 fs
+   106.180252075195     
+It is running-->Time         221           220.000000 fs
+   105.663604974747     
+It is running-->Time         222           221.000000 fs
+   104.136673927307     
+It is running-->Time         223           222.000000 fs
+   102.156996965408     
+It is running-->Time         224           223.000000 fs
+   102.174737930298     
+It is running-->Time         225           224.000000 fs
+   102.433002948761     
+It is running-->Time         226           225.000000 fs
+   102.225308895111     
+It is running-->Time         227           226.000000 fs
+   102.547205924988     
+It is running-->Time         228           227.000000 fs
+   106.734395980835     
+It is running-->Time         229           228.000000 fs
+   107.867396831512     
+It is running-->Time         230           229.000000 fs
+   109.510759115219     
+It is running-->Time         231           230.000000 fs
+   108.058224916458     
+It is running-->Time         232           231.000000 fs
+   109.326359987259     
+It is running-->Time         233           232.000000 fs
+   107.889567136765     
+It is running-->Time         234           233.000000 fs
+   107.696379184723     
+It is running-->Time         235           234.000000 fs
+   108.809794902802     
+It is running-->Time         236           235.000000 fs
+   108.384449958801     
+It is running-->Time         237           236.000000 fs
+   108.806996107101     
+It is running-->Time         238           237.000000 fs
+   108.094560146332     
+It is running-->Time         239           238.000000 fs
+   108.674249172211     
+It is running-->Time         240           239.000000 fs
+   107.896250963211     
+It is running-->Time         241           240.000000 fs
+   108.223412990570     
+It is running-->Time         242           241.000000 fs
+   108.015215873718     
+It is running-->Time         243           242.000000 fs
+   108.681202888489     
+It is running-->Time         244           243.000000 fs
+   108.415562868118     
+It is running-->Time         245           244.000000 fs
+   106.934235811234     
+It is running-->Time         246           245.000000 fs
+   107.150318861008     
+It is running-->Time         247           246.000000 fs
+   107.252398014069     
+It is running-->Time         248           247.000000 fs
+   107.394429922104     
+It is running-->Time         249           248.000000 fs
+   106.878520011902     
+It is running-->Time         250           249.000000 fs
+   107.108366012573     
+It is running-->Time         251           250.000000 fs
+   104.481192111969     
+It is running-->Time         252           251.000000 fs
+   103.138283967972     
+It is running-->Time         253           252.000000 fs
+   105.772058010101     
+It is running-->Time         254           253.000000 fs
+   105.895646095276     
+It is running-->Time         255           254.000000 fs
+   105.612593889236     
+It is running-->Time         256           255.000000 fs
+   103.946128845215     
+It is running-->Time         257           256.000000 fs
+   102.736355066299     
+It is running-->Time         258           257.000000 fs
+   102.416028976440     
+It is running-->Time         259           258.000000 fs
+   99.8201611042023     
+It is running-->Time         260           259.000000 fs
+   99.8465321063995     
+It is running-->Time         261           260.000000 fs
+   99.8054459095001     
+It is running-->Time         262           261.000000 fs
+   100.231522083282     
+It is running-->Time         263           262.000000 fs
+   99.8154990673065     
+It is running-->Time         264           263.000000 fs
+   99.8151738643646     
+It is running-->Time         265           264.000000 fs
+   99.8245518207550     
+It is running-->Time         266           265.000000 fs
+   98.7804431915283     
+It is running-->Time         267           266.000000 fs
+   96.1859869956970     
+It is running-->Time         268           267.000000 fs
+   96.1974179744720     
+It is running-->Time         269           268.000000 fs
+   96.0209341049194     
+It is running-->Time         270           269.000000 fs
+   96.0448479652405     
+It is running-->Time         271           270.000000 fs
+   95.9765720367432     
+It is running-->Time         272           271.000000 fs
+   94.0308279991150     
+It is running-->Time         273           272.000000 fs
+   89.9647698402405     
+It is running-->Time         274           273.000000 fs
+   89.7405200004578     
+It is running-->Time         275           274.000000 fs
+   87.6796548366547     
+It is running-->Time         276           275.000000 fs
+   88.2032701969147     
+It is running-->Time         277           276.000000 fs
+   101.463682174683     
+It is running-->Time         278           277.000000 fs
+   104.809942007065     
+It is running-->Time         279           278.000000 fs
+   106.289448022842     
+It is running-->Time         280           279.000000 fs
+   106.858265161514     
+It is running-->Time         281           280.000000 fs
+   106.372848987579     
+It is running-->Time         282           281.000000 fs
+   106.418129920959     
+It is running-->Time         283           282.000000 fs
+   106.750515937805     
+It is running-->Time         284           283.000000 fs
+   106.290017843246     
+It is running-->Time         285           284.000000 fs
+   106.312093973160     
+It is running-->Time         286           285.000000 fs
+   105.413367986679     
+It is running-->Time         287           286.000000 fs
+   105.562299966812     
+It is running-->Time         288           287.000000 fs
+   106.108185052872     
+It is running-->Time         289           288.000000 fs
+   105.967387914658     
+It is running-->Time         290           289.000000 fs
+   106.332010984421     
+It is running-->Time         291           290.000000 fs
+   106.125804901123     
+It is running-->Time         292           291.000000 fs
+   105.913490056992     
+It is running-->Time         293           292.000000 fs
+   106.171022176743     
+It is running-->Time         294           293.000000 fs
+   105.730532169342     
+It is running-->Time         295           294.000000 fs
+   106.251556873322     
+It is running-->Time         296           295.000000 fs
+   105.736665964127     
+It is running-->Time         297           296.000000 fs
+   105.995680093765     
+It is running-->Time         298           297.000000 fs
+   106.005198001862     
+It is running-->Time         299           298.000000 fs
+   106.156345844269     
+It is running-->Time         300           299.000000 fs
+   106.113805055618     
+It is running-->Time         301           300.000000 fs
+   105.925925970078     
+It is running-->Time         302           301.000000 fs
+   105.867056846619     
+It is running-->Time         303           302.000000 fs
+   105.401447057724     
+It is running-->Time         304           303.000000 fs
+   106.311239957809     
+It is running-->Time         305           304.000000 fs
+   105.833935022354     
+It is running-->Time         306           305.000000 fs
+   106.096688032150     
+It is running-->Time         307           306.000000 fs
+   106.066020965576     
+It is running-->Time         308           307.000000 fs
+   106.101998090744     
+It is running-->Time         309           308.000000 fs
+   106.127699136734     
+It is running-->Time         310           309.000000 fs
+   105.834754943848     
+It is running-->Time         311           310.000000 fs
+   105.850994110107     
+It is running-->Time         312           311.000000 fs
+   106.391158103943     
+It is running-->Time         313           312.000000 fs
+   105.907841920853     
+It is running-->Time         314           313.000000 fs
+   106.349575996399     
+It is running-->Time         315           314.000000 fs
+   103.598465204239     
+It is running-->Time         316           315.000000 fs
+   105.771219968796     
+It is running-->Time         317           316.000000 fs
+   106.085566997528     
+It is running-->Time         318           317.000000 fs
+   105.922451019287     
+It is running-->Time         319           318.000000 fs
+   106.356957197189     
+It is running-->Time         320           319.000000 fs
+   105.872872114182     
+It is running-->Time         321           320.000000 fs
+   106.369413137436     
+It is running-->Time         322           321.000000 fs
+   105.820791959763     
+It is running-->Time         323           322.000000 fs
+   106.052281856537     
+It is running-->Time         324           323.000000 fs
+   105.960433959961     
+It is running-->Time         325           324.000000 fs
+   103.658341884613     
+It is running-->Time         326           325.000000 fs
+   104.205969095230     
+It is running-->Time         327           326.000000 fs
+   106.215428829193     
+It is running-->Time         328           327.000000 fs
+   105.825011968613     
+It is running-->Time         329           328.000000 fs
+   106.287825107574     
+It is running-->Time         330           329.000000 fs
+   105.824333190918     
+It is running-->Time         331           330.000000 fs
+   106.106344938278     
+It is running-->Time         332           331.000000 fs
+   106.068889141083     
+It is running-->Time         333           332.000000 fs
+   105.893850088120     
+It is running-->Time         334           333.000000 fs
+   106.610635042191     
+It is running-->Time         335           334.000000 fs
+   106.212877988815     
+It is running-->Time         336           335.000000 fs
+   105.358431816101     
+It is running-->Time         337           336.000000 fs
+   105.772744894028     
+It is running-->Time         338           337.000000 fs
+   106.442450046539     
+It is running-->Time         339           338.000000 fs
+   103.827268123627     
+It is running-->Time         340           339.000000 fs
+   105.746686935425     
+It is running-->Time         341           340.000000 fs
+   105.761012077332     
+It is running-->Time         342           341.000000 fs
+   106.857816934586     
+It is running-->Time         343           342.000000 fs
+   104.565507888794     
+It is running-->Time         344           343.000000 fs
+   105.328557014465     
+It is running-->Time         345           344.000000 fs
+   104.097080945969     
+It is running-->Time         346           345.000000 fs
+   105.487859964371     
+It is running-->Time         347           346.000000 fs
+   106.365102052689     
+It is running-->Time         348           347.000000 fs
+   104.979071140289     
+It is running-->Time         349           348.000000 fs
+   106.795468091965     
+It is running-->Time         350           349.000000 fs
+   105.793172836304     
+It is running-->Time         351           350.000000 fs
+   105.725553989410     
+It is running-->Time         352           351.000000 fs
+   106.027384042740     
+It is running-->Time         353           352.000000 fs
+   105.948207855225     
+It is running-->Time         354           353.000000 fs
+   105.913681983948     
+It is running-->Time         355           354.000000 fs
+   105.823109149933     
+It is running-->Time         356           355.000000 fs
+   105.688724994659     
+It is running-->Time         357           356.000000 fs
+   103.345830917358     
+It is running-->Time         358           357.000000 fs
+   105.973689794540     
+It is running-->Time         359           358.000000 fs
+   106.128815174103     
+It is running-->Time         360           359.000000 fs
+   105.877871990204     
+It is running-->Time         361           360.000000 fs
+   104.540708065033     
+It is running-->Time         362           361.000000 fs
+   106.249563932419     
+It is running-->Time         363           362.000000 fs
+   106.201727867126     
+It is running-->Time         364           363.000000 fs
+   106.176474094391     
+It is running-->Time         365           364.000000 fs
+   106.268605947495     
+It is running-->Time         366           365.000000 fs
+   106.157992124557     
+It is running-->Time         367           366.000000 fs
+   106.237941026688     
+It is running-->Time         368           367.000000 fs
+   106.186851024628     
+It is running-->Time         369           368.000000 fs
+   105.961197137833     
+It is running-->Time         370           369.000000 fs
+   106.421989917755     
+It is running-->Time         371           370.000000 fs
+   105.946792125702     
+It is running-->Time         372           371.000000 fs
+   106.256049871445     
+It is running-->Time         373           372.000000 fs
+   106.167196035385     
+It is running-->Time         374           373.000000 fs
+   106.441118955612     
+It is running-->Time         375           374.000000 fs
+   106.180207014084     
+It is running-->Time         376           375.000000 fs
+   106.165749073029     
+It is running-->Time         377           376.000000 fs
+   106.141855001450     
+It is running-->Time         378           377.000000 fs
+   105.767886877060     
+It is running-->Time         379           378.000000 fs
+   104.954034805298     
+It is running-->Time         380           379.000000 fs
+   105.664173841476     
+It is running-->Time         381           380.000000 fs
+   106.040683031082     
+It is running-->Time         382           381.000000 fs
+   106.117252111435     
+It is running-->Time         383           382.000000 fs
+   106.120157957077     
+It is running-->Time         384           383.000000 fs
+   106.158370018005     
+It is running-->Time         385           384.000000 fs
+   106.162204027176     
+It is running-->Time         386           385.000000 fs
+   106.238925933838     
+It is running-->Time         387           386.000000 fs
+   105.096182107925     
+It is running-->Time         388           387.000000 fs
+   105.411751985550     
+It is running-->Time         389           388.000000 fs
+   106.021114110947     
+It is running-->Time         390           389.000000 fs
+   105.960223913193     
+It is running-->Time         391           390.000000 fs
+   106.036988973618     
+It is running-->Time         392           391.000000 fs
+   105.909588098526     
+It is running-->Time         393           392.000000 fs
+   106.146905899048     
+It is running-->Time         394           393.000000 fs
+   105.739231824875     
+It is running-->Time         395           394.000000 fs
+   105.750775098801     
+It is running-->Time         396           395.000000 fs
+   104.788664102554     
+It is running-->Time         397           396.000000 fs
+   105.502956151962     
+It is running-->Time         398           397.000000 fs
+   105.743459939957     
+It is running-->Time         399           398.000000 fs
+   106.145206928253     
+It is running-->Time         400           399.000000 fs
+   105.712499856949     
+It is running-->Time         401           400.000000 fs
+   105.707997798920     
+It is running-->Time         402           401.000000 fs
+   106.232467889786     
+It is running-->Time         403           402.000000 fs
+   105.745110034943     
+It is running-->Time         404           403.000000 fs
+   105.270725965500     
+It is running-->Time         405           404.000000 fs
+   105.407814979553     
+It is running-->Time         406           405.000000 fs
+   103.753875970840     
+It is running-->Time         407           406.000000 fs
+   102.634978055954     
+It is running-->Time         408           407.000000 fs
+   102.642657041550     
+It is running-->Time         409           408.000000 fs
+   102.679920911789     
+It is running-->Time         410           409.000000 fs
+   102.675323009491     
+It is running-->Time         411           410.000000 fs
+   100.892415046692     
+It is running-->Time         412           411.000000 fs
+   104.623385906219     
+It is running-->Time         413           412.000000 fs
+   105.886764049530     
+It is running-->Time         414           413.000000 fs
+   106.214561939240     
+It is running-->Time         415           414.000000 fs
+   105.736210107803     
+It is running-->Time         416           415.000000 fs
+   107.232104063034     
+It is running-->Time         417           416.000000 fs
+   103.452290058136     
+It is running-->Time         418           417.000000 fs
+   99.9378190040588     
+It is running-->Time         419           418.000000 fs
+   99.8135538101196     
+It is running-->Time         420           419.000000 fs
+   104.287158012390     
+It is running-->Time         421           420.000000 fs
+   105.824871063232     
+It is running-->Time         422           421.000000 fs
+   105.797568798065     
+It is running-->Time         423           422.000000 fs
+   105.824011802673     
+It is running-->Time         424           423.000000 fs
+   105.893209934235     
+It is running-->Time         425           424.000000 fs
+   105.876171827316     
+It is running-->Time         426           425.000000 fs
+   105.895050048828     
+It is running-->Time         427           426.000000 fs
+   105.914283990860     
+It is running-->Time         428           427.000000 fs
+   105.903347015381     
+It is running-->Time         429           428.000000 fs
+   105.943496942520     
+It is running-->Time         430           429.000000 fs
+   105.968012809753     
+It is running-->Time         431           430.000000 fs
+   105.019258975983     
+It is running-->Time         432           431.000000 fs
+   107.051053047180     
+It is running-->Time         433           432.000000 fs
+   105.222560882568     
+It is running-->Time         434           433.000000 fs
+   107.887545824051     
+It is running-->Time         435           434.000000 fs
+   108.285814046860     
+It is running-->Time         436           435.000000 fs
+   108.312272071838     
+It is running-->Time         437           436.000000 fs
+   108.361573934555     
+It is running-->Time         438           437.000000 fs
+   109.075082063675     
+It is running-->Time         439           438.000000 fs
+   107.789261102676     
+It is running-->Time         440           439.000000 fs
+   108.050379991531     
+It is running-->Time         441           440.000000 fs
+   107.868026971817     
+It is running-->Time         442           441.000000 fs
+   107.755165100098     
+It is running-->Time         443           442.000000 fs
+   107.775318145752     
+It is running-->Time         444           443.000000 fs
+   107.718802928925     
+It is running-->Time         445           444.000000 fs
+   107.531560182571     
+It is running-->Time         446           445.000000 fs
+   108.113186120987     
+It is running-->Time         447           446.000000 fs
+   107.745368003845     
+It is running-->Time         448           447.000000 fs
+   107.279453992844     
+It is running-->Time         449           448.000000 fs
+   106.469208955765     
+It is running-->Time         450           449.000000 fs
+   107.143771171570     
+It is running-->Time         451           450.000000 fs
+   103.413315057755     
+It is running-->Time         452           451.000000 fs
+   106.818218946457     
+It is running-->Time         453           452.000000 fs
+   102.642744064331     
+It is running-->Time         454           453.000000 fs
+   103.565762996674     
+It is running-->Time         455           454.000000 fs
+   106.911013841629     
+It is running-->Time         456           455.000000 fs
+   106.925433158875     
+It is running-->Time         457           456.000000 fs
+   105.683017969131     
+It is running-->Time         458           457.000000 fs
+   106.036345958710     
+It is running-->Time         459           458.000000 fs
+   101.248718976974     
+It is running-->Time         460           459.000000 fs
+   100.881151199341     
+It is running-->Time         461           460.000000 fs
+   100.846933126450     
+It is running-->Time         462           461.000000 fs
+   100.918858051300     
+It is running-->Time         463           462.000000 fs
+   102.086746931076     
+It is running-->Time         464           463.000000 fs
+   101.501499176025     
+It is running-->Time         465           464.000000 fs
+   100.635307073593     
+It is running-->Time         466           465.000000 fs
+   101.249789953232     
+It is running-->Time         467           466.000000 fs
+   100.341804981232     
+It is running-->Time         468           467.000000 fs
+   101.161058902740     
+It is running-->Time         469           468.000000 fs
+   101.028177976608     
+It is running-->Time         470           469.000000 fs
+   98.1366209983826     
+It is running-->Time         471           470.000000 fs
+   97.9261260032654     
+It is running-->Time         472           471.000000 fs
+   94.1623861789703     
+It is running-->Time         473           472.000000 fs
+   93.1329519748688     
+It is running-->Time         474           473.000000 fs
+   92.6211831569672     
+It is running-->Time         475           474.000000 fs
+   91.6862800121307     
+It is running-->Time         476           475.000000 fs
+   90.2619061470032     
+It is running-->Time         477           476.000000 fs
+   90.1193828582764     
+It is running-->Time         478           477.000000 fs
+   90.3050549030304     
+It is running-->Time         479           478.000000 fs
+   90.1579451560974     
+It is running-->Time         480           479.000000 fs
+   90.2461209297180     
+It is running-->Time         481           480.000000 fs
+   90.1475119590759     
+It is running-->Time         482           481.000000 fs
+   90.5354537963867     
+It is running-->Time         483           482.000000 fs
+   90.1865270137787     
+It is running-->Time         484           483.000000 fs
+   90.2409229278564     
+It is running-->Time         485           484.000000 fs
+   90.0236980915070     
+It is running-->Time         486           485.000000 fs
+   87.8507089614868     
+It is running-->Time         487           486.000000 fs
+   89.5012168884277     
+It is running-->Time         488           487.000000 fs
+   84.7896170616150     
+It is running-->Time         489           488.000000 fs
+   83.9996199607849     
+It is running-->Time         490           489.000000 fs
+   83.5671930313110     
+It is running-->Time         491           490.000000 fs
+   83.5700380802155     
+It is running-->Time         492           491.000000 fs
+   82.7564098834991     
+It is running-->Time         493           492.000000 fs
+   82.2047200202942     
+It is running-->Time         494           493.000000 fs
+   81.7987608909607     
+It is running-->Time         495           494.000000 fs
+   81.5694909095764     
+It is running-->Time         496           495.000000 fs
+   81.6617429256439     
+It is running-->Time         497           496.000000 fs
+   81.6541140079498     
+It is running-->Time         498           497.000000 fs
+   81.7197120189667     
+It is running-->Time         499           498.000000 fs
+   81.5745108127594     
+It is running-->Time         500           499.000000 fs
+   81.5367350578308     
+It is running-->Time         501           500.000000 fs
+   81.4313290119171     
+It is running-->Time         502           501.000000 fs
+   81.3585238456726     
+It is running-->Time         503           502.000000 fs
+   80.7848801612854     
+It is running-->Time         504           503.000000 fs
+   80.2078888416290     
+It is running-->Time         505           504.000000 fs
+   80.4641871452332     
+It is running-->Time         506           505.000000 fs
+   80.4107449054718     
+It is running-->Time         507           506.000000 fs
+   80.2548429965973     
+It is running-->Time         508           507.000000 fs
+   80.3136270046234     
+It is running-->Time         509           508.000000 fs
+   80.4874849319458     
+It is running-->Time         510           509.000000 fs
+   80.4442307949066     
+It is running-->Time         511           510.000000 fs
+   80.3067600727081     
+It is running-->Time         512           511.000000 fs
+   80.2469029426575     
+It is running-->Time         513           512.000000 fs
+   80.1225340366364     
+It is running-->Time         514           513.000000 fs
+   80.1293408870697     
+It is running-->Time         515           514.000000 fs
+   80.1579329967499     
+It is running-->Time         516           515.000000 fs
+   79.9440729618073     
+It is running-->Time         517           516.000000 fs
+   80.4502859115601     
+It is running-->Time         518           517.000000 fs
+   80.2073788642883     
+It is running-->Time         519           518.000000 fs
+   80.4048230648041     
+It is running-->Time         520           519.000000 fs
+   80.3902299404144     
+It is running-->Time         521           520.000000 fs
+   80.4394991397858     
+It is running-->Time         522           521.000000 fs
+   80.2664599418640     
+It is running-->Time         523           522.000000 fs
+   80.3515961170197     
+It is running-->Time         524           523.000000 fs
+   80.2190198898315     
+It is running-->Time         525           524.000000 fs
+   80.0372800827026     
+It is running-->Time         526           525.000000 fs
+   80.0775828361511     
+It is running-->Time         527           526.000000 fs
+   80.1042039394379     
+It is running-->Time         528           527.000000 fs
+   80.8644089698792     
+It is running-->Time         529           528.000000 fs
+   81.0592432022095     
+It is running-->Time         530           529.000000 fs
+   80.3691968917847     
+It is running-->Time         531           530.000000 fs
+   80.1781818866730     
+It is running-->Time         532           531.000000 fs
+   82.0026481151581     
+It is running-->Time         533           532.000000 fs
+   80.0180518627167     
+It is running-->Time         534           533.000000 fs
+   80.2251269817352     
+It is running-->Time         535           534.000000 fs
+   80.5151238441467     
+It is running-->Time         536           535.000000 fs
+   80.2981600761414     
+It is running-->Time         537           536.000000 fs
+   80.2888329029083     
+It is running-->Time         538           537.000000 fs
+   80.2883338928223     
+It is running-->Time         539           538.000000 fs
+   80.2516281604767     
+It is running-->Time         540           539.000000 fs
+   80.2784531116486     
+It is running-->Time         541           540.000000 fs
+   80.3291318416595     
+It is running-->Time         542           541.000000 fs
+   80.3122050762177     
+It is running-->Time         543           542.000000 fs
+   80.2480740547180     
+It is running-->Time         544           543.000000 fs
+   80.3908629417419     
+It is running-->Time         545           544.000000 fs
+   80.5208239555359     
+It is running-->Time         546           545.000000 fs
+   80.3224129676819     
+It is running-->Time         547           546.000000 fs
+   80.5673689842224     
+It is running-->Time         548           547.000000 fs
+   80.5831568241119     
+It is running-->Time         549           548.000000 fs
+   80.5155229568481     
+It is running-->Time         550           549.000000 fs
+   80.3930249214172     
+It is running-->Time         551           550.000000 fs
+   80.2896850109100     
+It is running-->Time         552           551.000000 fs
+   80.4384889602661     
+It is running-->Time         553           552.000000 fs
+   80.5067179203033     
+It is running-->Time         554           553.000000 fs
+   80.2675271034241     
+It is running-->Time         555           554.000000 fs
+   80.6324050426483     
+It is running-->Time         556           555.000000 fs
+   80.4281139373779     
+It is running-->Time         557           556.000000 fs
+   80.4648110866547     
+It is running-->Time         558           557.000000 fs
+   80.3167850971222     
+It is running-->Time         559           558.000000 fs
+   80.2444050312042     
+It is running-->Time         560           559.000000 fs
+   80.7998149394989     
+It is running-->Time         561           560.000000 fs
+   80.1299719810486     
+It is running-->Time         562           561.000000 fs
+   80.1767308712006     
+It is running-->Time         563           562.000000 fs
+   80.5062720775604     
+It is running-->Time         564           563.000000 fs
+   80.6947619915009     
+It is running-->Time         565           564.000000 fs
+   80.3031039237976     
+It is running-->Time         566           565.000000 fs
+   80.2930409908295     
+It is running-->Time         567           566.000000 fs
+   80.2930178642273     
+It is running-->Time         568           567.000000 fs
+   80.3697259426117     
+It is running-->Time         569           568.000000 fs
+   80.1066720485687     
+It is running-->Time         570           569.000000 fs
+   80.1740009784698     
+It is running-->Time         571           570.000000 fs
+   80.2319869995117     
+It is running-->Time         572           571.000000 fs
+   80.2643468379974     
+It is running-->Time         573           572.000000 fs
+   80.2340879440308     
+It is running-->Time         574           573.000000 fs
+   80.6383199691772     
+It is running-->Time         575           574.000000 fs
+   80.2426578998566     
+It is running-->Time         576           575.000000 fs
+   81.8474791049957     
+It is running-->Time         577           576.000000 fs
+   80.4595918655396     
+It is running-->Time         578           577.000000 fs
+   80.3807759284973     
+It is running-->Time         579           578.000000 fs
+   80.4791378974915     
+It is running-->Time         580           579.000000 fs
+   80.3941290378571     
+It is running-->Time         581           580.000000 fs
+   80.3997280597687     
+It is running-->Time         582           581.000000 fs
+   80.6418259143829     
+It is running-->Time         583           582.000000 fs
+   80.3882718086243     
+It is running-->Time         584           583.000000 fs
+   80.3464579582214     
+It is running-->Time         585           584.000000 fs
+   80.2378940582275     
+It is running-->Time         586           585.000000 fs
+   80.3007211685181     
+It is running-->Time         587           586.000000 fs
+   80.2595911026001     
+It is running-->Time         588           587.000000 fs
+   80.3537979125977     
+It is running-->Time         589           588.000000 fs
+   80.3360290527344     
+It is running-->Time         590           589.000000 fs
+   80.4514901638031     
+It is running-->Time         591           590.000000 fs
+   80.4678180217743     
+It is running-->Time         592           591.000000 fs
+   80.4196040630341     
+It is running-->Time         593           592.000000 fs
+   80.1596629619598     
+It is running-->Time         594           593.000000 fs
+   80.1598460674286     
+It is running-->Time         595           594.000000 fs
+   80.5385479927063     
+It is running-->Time         596           595.000000 fs
+   80.8126878738403     
+It is running-->Time         597           596.000000 fs
+   80.8922729492188     
+It is running-->Time         598           597.000000 fs
+   80.4769070148468     
+It is running-->Time         599           598.000000 fs
+   80.4386460781097     
+It is running-->Time         600           599.000000 fs
+   80.4883339405060     
+It is running-->Time         601           600.000000 fs
+   80.4868311882019     
+ =========================================================================
+          Output files print in created directory: output             
+                               T
+ =========================================================================
+                         Total Time
+                Sec                         Min
+      ********************         818.992538535594917
+ =========================================================================
+        Number of threads used   Number of processor in the computer
+                 1                           1
+ =========================================================================

@@ -1,3 +1,9 @@
+""" 
+This module contains the small help functions that are necessary
+for the simulation to work. For example, numerical derivatives and
+interpolation functions
+"""
+
 import numpy as np
 from math import sqrt
 
