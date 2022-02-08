@@ -1,8 +1,8 @@
 {   
     "spin_flux_path": "",
     "sim_params": {
-        "dx":10, 
-        "dy":10, 
+        "dx":100, 
+        "dy":100, 
         "dz":1, 
         "dt": 1, 
         "jef_terms": {

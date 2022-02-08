@@ -155,9 +155,13 @@ class Signal():
         return freq, E_f, E_f_abs, df
 
     def get_broadband(self):
+        
         E_f_max = np.amax(self.E_f_abs)
         bb_index  = np.argwhere(self.E_f_abs > E_f_max/self.p['bb_fraction']).flatten()
-        i_min, i_max =  bb_index[[1,-1]]
+        try:
+            i_min, i_max =  bb_index[[1,-1]]
+        except:
+            raise ValueError("Broadband analysis not possible for this signal and parameters")
         fmin, fmax = self.freq[[i_min, i_max]]
         delta_f = fmax - fmin
         bb_freq = (i_min, i_max, fmin, fmax)

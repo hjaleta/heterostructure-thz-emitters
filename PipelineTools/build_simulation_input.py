@@ -8,7 +8,6 @@ import json
 import numpy as np
 
 def build_param_json(source_path, target_path, z, spin_flux_path):
-    print(source_path)
     with open(source_path, "r") as source_params:
         params = json.load(source_params)
     if len(z) != len(params["medium_params"]):

@@ -1,6 +1,6 @@
 """ 
 This script runs several E-FIeld simulations. It obviously requires some folders which hold results from the
-Fortran simulations. 
+Fortran simulations
 """
 
 from EFieldSimulation.Simulation import Simulation
@@ -30,7 +30,7 @@ build_sim_params = True
 run_simulation = True
 
 # Number of timesteps
-sim_time = 10
+sim_time = 600
 
 # Parameters for signal post processing
 signal_params = {"padfactor":9, "n_interpol":1, "dt":1, "bb_fraction": 10}
@@ -50,36 +50,42 @@ if run_simulation: # Run simulation
     N_simulations = len(os.listdir(sim_folder)) # Number of simulations
     for f_i, folder in enumerate(os.listdir(sim_folder)): # Iterate iver result folders
 
-        # Define necessary paths
-        source_folderpath = "/".join( [spin_source_folder, folder])
-        result_folderpath = "/".join( [sim_folder, folder])
-        param_path = "/".join([source_folderpath, "input_params.json"])
+        try: # Try to perform the simulation
+            # Define necessary paths
+            source_folderpath = "/".join( [spin_source_folder, folder])
+            result_folderpath = "/".join( [sim_folder, folder])
+            param_path = "/".join([source_folderpath, "input_params.json"])
 
-        # Extract simulation parameters from json file
-        sim_params, medium_params, vacuum_params, spin_flux = decode_json_params(param_path, sim_time)
+            # Extract simulation parameters from json file
+            sim_params, medium_params, vacuum_params, spin_flux = decode_json_params(param_path, sim_time)
 
-        # Create simulation object
-        sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params, name = folder)
-        print(medium_params)
-        # Run simulation
-        sim.run(print_percent = 1)
+            # Create simulation object
+            sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params, name = folder)
+            # print(medium_params)
+            # print(signal_params)
+            # Run simulation
+            sim.run()
 
-        for E in sim.vacuum.E_fields: # Iterate over output signals
+            for E in sim.vacuum.E_fields: # Iterate over output signals
 
-            # Create Signal object
-            signal = Signal(E.Ex, signal_params, E.z, sim.name)
+                # Create Signal object
+                print("signal length ", len(E.Ex))
+                signal = Signal(E.Ex,  E.z, signal_params, sim.name)
 
-            # Generate filepaths for results
-            filepath = "/".join([result_folderpath, f"Signal z = {E.z:.2E} nm "])
-            fourier_plot_path = filepath + "spectra.png"
-            BW_plot_path = filepath + "BW.png"
-            transient_plot_path = filepath + "transient.png"
-            json_path = filepath + "data.json"
+                # Generate filepaths for results
+                filepath = "/".join([result_folderpath, f"Signal z = {E.z:.2E} nm "])
+                fourier_plot_path = filepath + "spectra.png"
+                BW_plot_path = filepath + "BW.png"
+                transient_plot_path = filepath + "transient.png"
+                json_path = filepath + "data.json"
 
-            # Save plots and data
-            signal.plot_BW(BW_plot_path)
-            signal.plot_signal(transient_plot_path)
-            signal.plot_fourier(fourier_plot_path)
-            signal.export_json(json_path)
+                # Save plots and data
+                signal.plot_BW(BW_plot_path)
+                signal.plot_signal(transient_plot_path)
+                signal.plot_fourier(fourier_plot_path)
+                signal.export_json(json_path)
 
-        print(f"Simulation {f_i + 1} of {N_simulations} completed")
+            print(f"Simulation {f_i + 1} of {N_simulations} completed")
+
+        except: # Declare failure
+            print(f"Simulation {f_i + 1} of {N_simulations} did not complete")
