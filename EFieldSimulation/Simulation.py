@@ -5,7 +5,7 @@ This module contains the classes we use in the simulation of the heterostructure
 import numpy as np
 from time import perf_counter
 from math import ceil
-from EfieldSimulation.help_functions import (get_J, get_J_t, get_r_tuple, 
+from EFieldSimulation.help_functions import (get_J, get_J_t, get_r_tuple, 
             back_diff1, back_diff2, interpolation, calc_delta_t)
 
 class Simulation:

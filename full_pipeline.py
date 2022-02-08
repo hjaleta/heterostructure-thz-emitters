@@ -1,5 +1,5 @@
-from EfieldSimulation.Simulation import Simulation
-from Frequency.Broadband import Signal
+from EFieldSimulation.Simulation import Simulation
+from EFieldSimulation.Frequency.Signal import Signal
 from PipelineTools.check_data import check_folders, check_flux
 from PipelineTools.build_simulation_input import build_simulation_setup, build_param_json, decode_json_params
 import os
