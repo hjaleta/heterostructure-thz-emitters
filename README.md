@@ -1,25 +1,25 @@
 # TeraHertz radiation from laser pumped heterostructures
 
-This repository's purpose is to model and simulate laser pumped heterostructures. For detailed description of the modelling, 
-please check the EFiieldSimulation.Simulation module, or the associated report.
+This repository's purpose is to model and simulate laser pumped heterostructures. For detailed description of the modelling,  please check the associated report.
 
 ### Packages
 
+For more detailed documentation, check the  ```__init__.py``` file in every package
+
+
+
 ##### Fortran Simulation
 
-The 
+This package contains files and modules related to the Fortran simulations
 
 ##### EFieldSimulation
-Represent the simulated system. It takes the output from the Fortran code as its input, and outputs E-fields.
 
-This module's purpose is to simplify the execution of Pavel Balaz's Superdiffusive Spin Transport script in Fortran. 
+This package performs the simulation of the heterostructure
 
-EfieldSimulation:
-    
+#### AnalyseResults
 
-Frequency:
-    This module contains script that analyze the frequenzy properties of the simulated E-field.
+This package perform some simple analysis of the found results
 
-PipelineTools:
-    This module contains pipeline functions that helps perform the entire Python simulation, from spin current to final results
-     
+#### PipelineTools
+
+This package helps the user to automatically perform multiple sequential simulations

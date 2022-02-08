@@ -1,6 +1,8 @@
 """ 
 This script runs several E-Field simulations. It obviously requires some folders which hold results from the
 Fortran simulations
+
+The results and plots are saved in the specified directory.
 """
 
 from EFieldSimulation.Simulation import Simulation
@@ -61,8 +63,7 @@ def main():
 
                 # Create simulation object
                 sim = Simulation(spin_flux, sim_params, medium_params, vacuum_params, name = folder)
-                # print(medium_params)
-                # print(signal_params)
+
                 # Run simulation
                 sim.run()
 
@@ -84,7 +85,6 @@ def main():
                     signal.plot_fourier(fourier_plot_path)
                     signal.export_json(json_path)
 
-                # print(f"Simulation {f_i + 1} of {N_simulations} completed")
 
             except: # Declare failure
                 print(f"Simulation {f_i + 1} of {N_simulations} did not complete")
