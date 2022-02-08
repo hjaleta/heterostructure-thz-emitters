@@ -41,7 +41,7 @@ def main():
         if len(non_complete)>0:
             print(f"Folders {', '.join(non_complete)} don't have a valid flux.out file ")
         else:
-            print(f"All {len(complete)} folders have a valid flux.out file")
+            print(f"All {len(complete)} folders have a valid flux.out file\n--------------")
 
     if build_sim_params: # Construct the necessary json files
         build_simulation_setup(spin_source_folder, sim_folder, json_source_path, num_layers=2)
@@ -69,7 +69,6 @@ def main():
                 for E in sim.vacuum.E_fields: # Iterate over output signals
 
                     # Create Signal object
-                    print("signal length ", len(E.Ex))
                     signal = Signal(E.Ex,  E.z, signal_params, sim.name)
 
                     # Generate filepaths for results
@@ -85,7 +84,7 @@ def main():
                     signal.plot_fourier(fourier_plot_path)
                     signal.export_json(json_path)
 
-                print(f"Simulation {f_i + 1} of {N_simulations} completed")
+                # print(f"Simulation {f_i + 1} of {N_simulations} completed")
 
             except: # Declare failure
                 print(f"Simulation {f_i + 1} of {N_simulations} did not complete")
