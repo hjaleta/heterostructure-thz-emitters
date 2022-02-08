@@ -3,6 +3,10 @@ This script runs several E-Field simulations. It obviously requires some folders
 Fortran simulations
 
 The results and plots are saved in the specified directory.
+
+IMPORTANT: The general, fixed parameters are decided in the file whose path is stored in the variable 'json_source_path'.
+Modify this file, or create a copy and modify that file to change parameters
+
 """
 
 from EFieldSimulation.Simulation import Simulation
@@ -14,10 +18,10 @@ import os
 # Folder with subfolders with results from Fortran
 
 # spin_source_folder = "FortranSimulation/Fortran Results/FuPt-closed"
-spin_source_folder = "FortranSimulation/Fortran Results/test_results"
+spin_source_folder = "FortranSimulation/FortranResults/test_results"
 
 # Folder to save the subfolders with simulation results
-sim_folder = "EFieldSimulation/Simulation Results_2/FuPt-closed"
+sim_folder = "EFieldSimulation/SimulationResults_2/FuPt-closed"
 
 # Template file for input parameters 
 json_source_path = "EFieldSimulation/input_params.json"
